@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System Status / Stanje sistema — Web Security Scanner · Real-time</title>
+  <meta name="description" content="Real-time status of Web Security Scanner: frontend, backend API and database health. Uptime monitoring. · Real-time status Web Security Scanner-a: frontend, backend API i database. Uptime monitoring.">
+  <meta name="keywords" content="status, system status, stanje sistema, uptime, service status, real-time status, server status, API status, website uptime, health check, status page">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://security-skener.gradovi.rs/status">
+  <link rel="alternate" hreflang="sr" href="https://security-skener.gradovi.rs/status">
+  <link rel="alternate" hreflang="x-default" href="https://security-skener.gradovi.rs/status">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="System Status / Stanje sistema">
+  <meta property="og:description" content="Real-time health: frontend, backend, database. · Real-time stanje: frontend, backend, database.">
+  <meta property="og:url" content="https://security-skener.gradovi.rs/status">
+  <meta property="og:site_name" content="Web Security Scanner">
+  <meta property="og:locale" content="sr_RS">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta property="og:image" content="https://security-skener.gradovi.rs/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="System Status / Stanje sistema — Web Security Scanner">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="System Status / Stanje sistema">
+  <meta name="twitter:description" content="Real-time uptime. · Real-time uptime.">
+  <meta name="twitter:image" content="https://security-skener.gradovi.rs/og-image.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://security-skener.gradovi.rs/"},
+      {"@type": "ListItem", "position": 2, "name": "Stanje sistema", "item": "https://security-skener.gradovi.rs/status"}
+    ]
+  }
+  </script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./blog-common.css">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 0;
+      background: #0a0c15; color: #e8eaf6;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+    }
+    .status-page {
+      max-width: 620px; margin: 0 auto;
+      padding: 2.5rem 1.2rem 3rem;
+    }
+    .status-header { text-align: center; margin-bottom: 2rem; }
+    .status-header h1 {
+      font-size: 1.5rem; margin: 0 0 0.3rem;
+      color: #e8eaf6; font-weight: 800;
+    }
+    .status-header p {
+      font-size: 0.8rem; color: #7b83a6; margin: 0;
+    }
+    .status-overall {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.55rem 1.3rem; border-radius: 20px;
+      font-size: 0.85rem; font-weight: 700; margin-top: 1rem;
+    }
+    .status-overall.all-ok { background: rgba(34,197,94,0.1); color: #22c55e; border: 1px solid rgba(34,197,94,0.2); }
+    .status-overall.has-issue { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
+    .status-overall.checking { background: rgba(59,130,246,0.1); color: #3b82f6; border: 1px solid rgba(59,130,246,0.2); }
+
+    .status-grid { display: flex; flex-direction: column; gap: 0.7rem; margin-bottom: 1.5rem; }
+    .status-card {
+      display: flex; align-items: center; gap: 0.8rem;
+      padding: 0.9rem 1.1rem; background: #12142a;
+      border: 1px solid rgba(255,255,255,0.06); border-radius: 10px;
+    }
+    .status-dot {
+      width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0;
+      background: #3b82f6; animation: pulse 1.5s infinite;
+    }
+    .status-dot.ok { background: #22c55e; animation: none; }
+    .status-dot.err { background: #ef4444; animation: none; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .status-info { flex: 1; min-width: 0; }
+    .status-name { font-weight: 700; font-size: 0.85rem; color: #e8eaf6; }
+    .status-detail {
+      font-size: 0.73rem; color: #7b83a6; margin-top: 0.15rem;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .status-latency {
+      font-size: 0.7rem; color: #7b83a6; background: rgba(255,255,255,0.04);
+      padding: 0.2rem 0.5rem; border-radius: 6px; font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .status-uptimerobot {
+      display: flex; justify-content: center; margin-bottom: 1.5rem;
+    }
+    .status-uptimerobot a {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.55rem 1.1rem;
+      background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.2);
+      border-radius: 8px; color: #a78bfa; font-size: 0.8rem;
+      font-weight: 600; text-decoration: none;
+      transition: background 0.15s;
+    }
+    .status-uptimerobot a:hover { background: rgba(124,58,237,0.15); }
+
+    .status-note {
+      text-align: center; font-size: 0.73rem; color: #555;
+      line-height: 1.6; padding: 1rem 0;
+      border-top: 1px solid rgba(255,255,255,0.04);
+    }
+    .status-note a { color: #a78bfa; text-decoration: none; }
+    .status-note a:hover { text-decoration: underline; }
+    .status-timestamp {
+      text-align: center; font-size: 0.68rem; color: #444; margin-top: 0.5rem;
+    }
+
+    @media (max-width: 500px) {
+      .status-page { padding: 1.5rem 0.8rem 2rem; }
+      .status-header h1 { font-size: 1.25rem; }
+      .status-card { padding: 0.75rem 0.9rem; gap: 0.6rem; }
+      .status-detail { white-space: normal; }
+    }
+  </style>
+</head>
+<body>
+    <div class="status-page">
+      <div class="status-header">
+        <h1>
+          <span class="sr">Stanje sistema</span>
+          <span class="en">System Status</span>
+        </h1>
+        <div class="status-overall checking" id="statusOverall">
+          <span class="sr">Proveravam...</span>
+          <span class="en">Checking...</span>
+        </div>
+      </div>
+
+      <div class="status-grid" id="statusGrid">
+        <!-- Frontend -->
+        <div class="status-card" id="cardFrontend">
+          <div class="status-dot" id="dotFrontend"></div>
+          <div class="status-info">
+            <div class="status-name">Frontend (Vercel)</div>
+            <div class="status-detail" id="detailFrontend">
+              <span class="sr">Proveravam...</span>
+              <span class="en">Checking...</span>
+            </div>
+          </div>
+          <div class="status-latency" id="latFrontend">—</div>
+        </div>
+        <!-- Backend -->
+        <div class="status-card" id="cardBackend">
+          <div class="status-dot" id="dotBackend"></div>
+          <div class="status-info">
+            <div class="status-name">Backend API (HuggingFace)</div>
+            <div class="status-detail" id="detailBackend">
+              <span class="sr">Proveravam...</span>
+              <span class="en">Checking...</span>
+            </div>
+          </div>
+          <div class="status-latency" id="latBackend">—</div>
+        </div>
+        <!-- Database -->
+        <div class="status-card" id="cardDb">
+          <div class="status-dot" id="dotDb"></div>
+          <div class="status-info">
+            <div class="status-name">Database (Supabase)</div>
+            <div class="status-detail" id="detailDb">
+              <span class="sr">Proveravam...</span>
+              <span class="en">Checking...</span>
+            </div>
+          </div>
+          <div class="status-latency" id="latDb">—</div>
+        </div>
+        <!-- Scanner -->
+        <div class="status-card" id="cardScanner">
+          <div class="status-dot" id="dotScanner"></div>
+          <div class="status-info">
+            <div class="status-name">Scanner Engine</div>
+            <div class="status-detail" id="detailScanner">
+              <span class="sr">Proveravam...</span>
+              <span class="en">Checking...</span>
+            </div>
+          </div>
+          <div class="status-latency" id="latScanner">—</div>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-bottom:1.2rem;">
+        <a href="https://stats.uptimerobot.com/Vt053zKLKv" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.6rem 1.2rem;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);border-radius:8px;color:#a78bfa;font-size:0.82rem;font-weight:600;text-decoration:none;">
+          <span class="sr">Nezavisni monitoring (UptimeRobot) &rarr;</span>
+          <span class="en">Independent monitoring (UptimeRobot) &rarr;</span>
+        </a>
+      </div>
+      <div class="status-note">
+        <span class="sr">
+          Ova stranica proverava komponente u realnom vremenu.
+          Za nezavisnu istoriju uptime-a (60 dana) pogledajte <a href="https://stats.uptimerobot.com/Vt053zKLKv" target="_blank" rel="noopener">UptimeRobot dashboard</a>.
+          Kontakt: <a href="mailto:kontakt@gradovi.rs">kontakt@gradovi.rs</a>.
+          Verzija politike: <a href="./privacy.html#pp14">§14</a>.
+        </span>
+        <span class="en">
+          This page checks components in real time.
+          For independent uptime history (60 days) see <a href="https://stats.uptimerobot.com/Vt053zKLKv" target="_blank" rel="noopener">UptimeRobot dashboard</a>.
+          Contact: <a href="mailto:kontakt@gradovi.rs">kontakt@gradovi.rs</a>.
+          Policy version: <a href="./privacy.html#pp14e">§14</a>.
+        </span>
+      </div>
+      <div class="status-timestamp" id="statusTimestamp"></div>
+    </div>
+<script src="./cookie-consent.js" defer></script>
+<script src="./blog-common.js" defer></script>
+<script>
+(function() {
+  var API = "https://unlimitededition-web-security-scanner.hf.space";
+  var results = { frontend: null, backend: null, db: null, scanner: null };
+
+  function setStatus(id, ok, detail, latency) {
+    var dot = document.getElementById("dot" + id);
+    var det = document.getElementById("detail" + id);
+    var lat = document.getElementById("lat" + id);
+    dot.className = "status-dot " + (ok ? "ok" : "err");
+    det.textContent = detail;
+    if (latency !== null) lat.textContent = latency + "ms";
+    else lat.textContent = ok ? "OK" : "DOWN";
+  }
+
+  function updateOverall() {
+    var all = Object.values(results);
+    if (all.some(function(v) { return v === null; })) return;
+    var el = document.getElementById("statusOverall");
+    var allOk = all.every(function(v) { return v === true; });
+    el.className = "status-overall " + (allOk ? "all-ok" : "has-issue");
+    el.textContent = allOk
+      ? (document.body.classList.contains("lang-en") ? "All systems operational" : "Svi sistemi funkcionalni")
+      : (document.body.classList.contains("lang-en") ? "Some systems have issues" : "Neki sistemi imaju problem");
+  }
+
+  // 1. Frontend — we're already on it, so it's working
+  results.frontend = true;
+  setStatus("Frontend", true, "Vercel CDN — operational", null);
+
+  // 2. Backend health check
+  var t0 = performance.now();
+  fetch(API + "/health")
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var ms = Math.round(performance.now() - t0);
+      results.backend = true;
+      var detail = "Queue: " + (data.queue_length || 0) + " | Active: " + (data.active_scans || 0) + "/" + (data.max_concurrent || 3);
+      setStatus("Backend", true, detail, ms);
+
+      // 3. Database from health response
+      if (data.db && data.db.reachable) {
+        results.db = true;
+        setStatus("Db", true, "Supabase Postgres — connected", null);
+      } else {
+        results.db = false;
+        setStatus("Db", false, "Database unreachable", null);
+      }
+
+      // 4. Scanner engine
+      results.scanner = true;
+      var scanDetail = (data.active_scans || 0) + " active, " + (data.queue_length || 0) + " queued, max " + (data.max_concurrent || 3);
+      setStatus("Scanner", true, scanDetail, null);
+
+      updateOverall();
+    })
+    .catch(function(e) {
+      results.backend = false;
+      results.db = false;
+      results.scanner = false;
+      setStatus("Backend", false, "API unreachable: " + e.message, null);
+      setStatus("Db", false, "Cannot verify (API down)", null);
+      setStatus("Scanner", false, "Cannot verify (API down)", null);
+      updateOverall();
+    });
+
+  // Timestamp
+  document.getElementById("statusTimestamp").textContent = "Checked: " + new Date().toISOString().replace("T", " ").substring(0, 19) + " UTC";
+})();
+</script>
+</body>
+</html>

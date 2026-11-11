@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms of Service / Uslovi koriscenja — Web Security Scanner · ToS · Pravila</title>
+  <meta name="description" content="Terms of Service for Web Security Scanner — rules, limits, user responsibility when scanning websites, Pro subscription terms. · Uslovi koriscenja za Web Security Scanner — pravila, ogranicenja, odgovornost pri skeniranju sajtova, uslovi Pro pretplate.">
+  <meta name="keywords" content="uslovi koriscenja, ToS, Terms of Service, pravila koriscenja, scanner pravila, Pro pretplata uslovi, Web Security Scanner uslovi, terms and conditions, user agreement, scanning rules, acceptable use policy, AUP, refund policy, subscription terms">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://security-skener.gradovi.rs/terms.html">
+  <link rel="alternate" hreflang="sr" href="https://security-skener.gradovi.rs/terms.html">
+  <link rel="alternate" hreflang="x-default" href="https://security-skener.gradovi.rs/terms.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Terms of Service / Uslovi koriscenja">
+  <meta property="og:description" content="Rules, limits, user responsibility, Pro subscription terms. · Pravila, ogranicenja, odgovornost, uslovi Pro pretplate.">
+  <meta property="og:url" content="https://security-skener.gradovi.rs/terms.html">
+  <meta property="og:site_name" content="Web Security Scanner">
+  <meta property="og:locale" content="sr_RS">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Terms of Service / Uslovi koriscenja">
+  <meta name="twitter:description" content="ToS, rules, Pro subscription. · Uslovi, pravila, Pro pretplata.">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./blog-common.css">
+</head>
+<body>
+<div class="blog-layout">
+  <aside class="timeline-nav">
+    <div class="sr"><div class="timeline-title">Sadrzaj</div><ol id="timeline-sr"></ol></div>
+    <div class="en"><div class="timeline-title">Contents</div><ol id="timeline-en"></ol></div>
+  </aside>
+  <main class="blog-content">
+
+  <!-- SERBIAN -->
+  <div class="sr">
+    <h1>Uslovi koriscenja</h1>
+    <p class="subtitle">Verzija 2026-04-13-v4 &middot; Poslednje azuriranje: 13. april 2026. &middot; <em>v4: javna galerija rezultata (opt-in objava, sekcija 15).</em></p>
+
+    <h2 id="tos1">1. Prihvatanje uslova</h2>
+    <p>Koriscenjem Web Security Scanner-a (dalje u tekstu <strong>&quot;Servis&quot;</strong>) prihvatate ove uslove u celosti. Ako se ne slazete, molim vas da ne koristite Servis. Svaka scan operacija zahteva eksplicitno potvrdjivanje pristanka pre nego sto se pokrene, a verzija uslova u trenutku pristanka se zapisuje u nas audit log kao pravni dokaz saglasnosti.</p>
+
+    <h2 id="tos2">2. Sta Servis radi</h2>
+    <p>Servis izvrsava <strong>pasivne bezbednosne provere</strong> javno dostupnih veb sajtova. To znaci:</p>
+    <ul>
+      <li>Citamo samo informacije koje su javno dostupne kroz HTTP/HTTPS zahteve (headere, HTML, DNS zapise, SSL certifikate)</li>
+      <li>Ne pokusavamo eksploatisanje ranjivosti, ne saljemo payload-e, ne trazimo zaobilazenje autentikacije</li>
+      <li>Svaki scan ima maksimalnu duzinu od 180 sekundi i rate limit od 5 skeniranja po 30 minuta po IP adresi</li>
+      <li>SSRF zastita sprecava da Servis bude zloupotrebljen za skeniranje internih mreza ili cloud metadata endpoint-a</li>
+    </ul>
+
+    <h2 id="tos3">3. Vasa odgovornost kao korisnika</h2>
+    <p><strong>Vi ste odgovorni da imate pravnu dozvolu da skenirate bilo koji domen koji unosite u Servis.</strong> Prihvatljivi slucajevi koriscenja:</p>
+    <ul>
+      <li><strong>Vas sopstveni sajt</strong> — ako ste vlasnik domena ili imate administrativni pristup</li>
+      <li><strong>Klijentov sajt</strong> — uz pismenu dozvolu vlasnika sajta (npr. kao deo ugovora o bezbednosnoj reviziji)</li>
+      <li><strong>Javno dostupan sajt u svrhu edukacije</strong> — pod uslovom da koristite rezultate samo za licno ucenje i da ne ugrozavate sajt kroz previse cestih zahteva</li>
+      <li><strong>CTF i bug bounty programi</strong> — kada pravila programa eksplicitno dozvoljavaju automatske skenere</li>
+    </ul>
+    <p><strong>Zabranjena je upotreba Servisa za:</strong></p>
+    <ul>
+      <li>Neovlasceno skeniranje tudjih sajtova u pripremi za napad</li>
+      <li>Mass-scanning kao deo rekognasce kampanje protiv veceg broja meta</li>
+      <li>Pokusaj skeniranja internih, privatnih, ili loopback adresa (SSRF zastita ce ionako blokirati, ali pokusaj je sam po sebi krsenje uslova)</li>
+      <li>Skeniranje sajtova cije ste vlasnika vec obavestili da ne zele da budu skenirani preko nase abuse-report procedure</li>
+    </ul>
+
+    <h2 id="tos4">4. Pristanak na svaki scan</h2>
+    <p>Pre pokretanja svakog skeniranja, morate eksplicitno oznaciti checkbox kojim potvrdjujete da imate dozvolu za taj konkretni domen. Ovaj checkbox je pravni dokumentovani pristanak, ne samo UI ukrasni element. Potvrdom se u nas audit log zapisuju:</p>
+    <ul>
+      <li>Da ste potvrdili pristanak (<code>consent_accepted: true</code>)</li>
+      <li>Verzija ovih uslova koja je bila na snazi (<code>consent_version</code>)</li>
+      <li>Vremenski pecat, URL koji ste zadali, i pseudonimizovana IP adresa i User-Agent</li>
+    </ul>
+    <p>Ako u buducnosti dodje do pravnog spora oko toga da li ste imali dozvolu, mi cemo koristiti ove zapise kao dokaz da ste izjavili da imate pravo da skenirate.</p>
+
+    <h2 id="tos5">5. Sta se cuva u nasoj bazi</h2>
+    <p>Detalji o tome sta konkretno cuvamo, koliko dugo, i kako se podaci stite, opisani su u <a href="./privacy.html">Politici privatnosti</a>. Ukratko:</p>
+    <ul>
+      <li>URL, domen, i rezultat scan-a se cuvaju u nasoj bazi radi audit traga i kasnijeg pregleda od strane korisnika</li>
+      <li>IP adresa i User-Agent se cuvaju kao SHA-256 hash sa server-side salt-om (pseudonimizacija u smislu GDPR Art. 4(5))</li>
+      <li>Audit log je append-only i cuva se do 90 dana, osim redova koji su flagovani kao pravna evidencija</li>
+      <li>Dnevni enkriptovani backup se sprema na Cloudflare R2 offsite storage</li>
+    </ul>
+
+    <h2 id="tos6">6. Prava vlasnika skeniranog sajta (abuse report)</h2>
+    <p>Ako ste vlasnik domena koji je skeniran bez vase dozvole, mozete poslati prijavu zloupotrebe preko link-a &quot;Prijavi zloupotrebu&quot; u footer-u sajta ili direktno na <a href="/abuse-report#form">stranici za prijavu zloupotrebe</a>. Za svaku prijavu:</p>
+    <ul>
+      <li>Pregledamo u roku od 72 sata</li>
+      <li>Ako je prijava legitimna, dodajemo vas domen na listu blokade — svi buduci scan-ovi tog domena ce biti odbijeni sa HTTP 403</li>
+      <li>Povezani audit_log zapisi se flaguju kao pravna evidencija i zadrzavaju zauvek (osim ako nalozi za brisanje ne nalazu drugacije)</li>
+      <li>Ako ostavite kontakt email, obavestavamo vas o ishodu</li>
+    </ul>
+
+    <h2 id="tos7">7. Dva moda skeniranja — gate-before-scan model</h2>
+    <p>Servis nudi <strong>dva moda skeniranja</strong>, odvojena strogim gate-om na backend-u:</p>
+
+    <h3>7.1. Brzi javni sken (default, bez verifikacije)</h3>
+    <p>Pokrece se klikom na dugme <strong>Brzi javni sken</strong>. Pokrece <strong>20 pasivnih provera</strong> koje koriste samo informacije koje je vec poznat svaki javni posetilac sajta: SSL/TLS sertifikat, HTTP header-i, javni DNS zapisi (SPF, DMARC, DNSSEC), homepage HTML, robots.txt, security.txt, well-known endpoint-i, performanse, accessibility, GDPR detekcija, WHOIS, CT logovi, Mozilla Observatory. Tri SAFE+REDACTED check-a (Information Disclosure, JavaScript Security, JWT Security) takodje rade ali zamenjuju tacne vrednosti placeholder-om <em>"verifikujte vlasnistvo da vidite tacne podatke"</em>.</p>
+    <p>U ovom modu skener <strong>NE SALJE NIJEDAN PROBE</strong> ka privatnoj infrastrukturi sajta. Target server nece naci nijedan GET zahtev za <code>/.env</code>, <code>/.git/config</code>, <code>/wp-admin/</code>, <code>/phpmyadmin/</code>, port scan, ili bilo sta sto bi legitiman vlasnik tretirao kao recon. Cilj je: brza, stateless, ne-kompromitujuca provera koju moze da pokrene bilo ko bez pravnog rizika.</p>
+
+    <h3>7.2. Puni sken (samo za vlasnike, kroz wizard)</h3>
+    <p>Pokrece se klikom na dugme <strong>🔓 Puni sken (vlasnici sajta)</strong>. Otvara se wizard koji vodi kroz 3 koraka:</p>
+    <ol>
+      <li><strong>Tri eksplicitne saglasnosti</strong> — svaki klik se zapisuje u nas audit log uz pseudonimizovani IP hash:
+        <ul>
+          <li>Vlasnistvo / pisano ovlascenje od vlasnika</li>
+          <li>Razumevanje da scanner pokrece aktivne probe ka osetljivim fajlovima, admin panelima, portovima baze podataka i ranjivostima — sa punom pravnom odgovornoscu</li>
+          <li>Saglasnost sa 30-dnevnim cuvanjem nalaza vezanim za vas IP hash</li>
+        </ul>
+      </li>
+      <li><strong>Verifikacija vlasnistva</strong> — dokazite da kontrolisete domen kroz jednu od tri metode:
+        <ul>
+          <li><strong>Meta tag</strong> u <code>&lt;head&gt;</code> pocetne stranice</li>
+          <li><strong>Fajl</strong> u <code>/.well-known/scanner-verify.txt</code></li>
+          <li><strong>DNS TXT zapis</strong> na <code>_scanner-verify.vasdomen.com</code></li>
+        </ul>
+      </li>
+      <li><strong>Recap i finalna potvrda</strong> — wizard prikazuje sumarno sve sto ste odobrili. Dugme za pokretanje punog skena ima 3-sekundni delay (anti-reflex mera) tako da recap stvarno bude procitan pre klika.</li>
+    </ol>
+    <p>Tek nakon sto sve 3 saglasnosti prodju, vlasnistvo bude verifikovano, i finalna potvrda bude data, scanner pokrece <strong>dodatnih 10 aktivnih check-ova</strong>: scan osetljivih fajlova, admin panel detekciju, vulnerability scan, port scan, API security (GraphQL introspection, swagger), CORS analizu, dependency CVE check, subdomain enumeration, takeover detekciju, WordPress deep-pass.</p>
+    <p>Uspesna verifikacija vazi <strong>30 dana</strong> po kombinaciji (domen, IP hash). Posle isteka, ponovo prolazite kroz wizard. Ova politika postoji da bi se sprecilo zlonamerno koriscenje Servisa kao exploit cheat-sheet-a za tudje sajtove.</p>
+    <p><strong>Privacy-by-design:</strong> wizard tabela <code>scan_requests</code> cuva samo datum kreiranja (DATE), bez timestamp-a, tako da cak ni potpuni leak baze ne moze da otkrije tacno vreme kad ste klikali consent checkbox-e.</p>
+
+    <h2 id="tos8">8. Ogranicenja odgovornosti</h2>
+    <p>Servis se pruza <strong>&quot;kako jeste&quot;</strong>, bez ikakvih garancija, izriciitih ili implicitnih. Konkretno:</p>
+    <ul>
+      <li>Ne garantujemo da ce svi mogucu ranjivosti biti otkrivene — scanner je pasivan i ne moze videti ono sto zahteva autentikaciju ili interaktivni probe</li>
+      <li>Ne garantujemo tacnost rezultata za sajtove iza bot-protection challenge stranica (Cloudflare, DataDome, itd.)</li>
+      <li>Nismo odgovorni za bilo kakvu stetu koja proizadje iz vaseg koriscenja ili nemogucnosti koriscenja Servisa</li>
+      <li>Nismo odgovorni ako vas sajt usporava ili padne tokom scan-a (ne bi trebalo da se desi — koristimo razumne timeout-e i rate limit-ove, ali theoretically moguce)</li>
+    </ul>
+
+    <h2 id="tos9">9. Izmene uslova</h2>
+    <p>Zadrzavamo pravo da azuriramo ove uslove. Kad menjamo, bump-ujemo verziju (<code>consent_version</code>) i svaki novi scan ce morati da potvrdi novu verziju. Vase prethodne saglasnosti ostaju vazece u audit log-u ali se ne retroaktivno primenjuju na nove pravne odredbe.</p>
+
+    <h2 id="tos10">10. Kontakt i sporovi</h2>
+    <p>Za sva pitanja u vezi sa ovim uslovima, kontaktirajte nas na <a href="mailto:kontakt@gradovi.rs">kontakt@gradovi.rs</a>. Za sigurnosne propuste: <a href="mailto:security@gradovi.rs">security@gradovi.rs</a>. Za abuse prijave: <a href="mailto:abuse@gradovi.rs">abuse@gradovi.rs</a>. Za Pro plan: <a href="mailto:pro@gradovi.rs">pro@gradovi.rs</a>. Eventualni sporovi se resavaju prema pravu Republike Srbije i ZZPL-u, osim u meri u kojoj lokalni propisi daju korisniku jace pravo.</p>
+
+    <h2 id="tos11">11. Placeni planovi (Pro pretplata)</h2>
+    <p>Pored besplatnog tier-a koji je detaljno opisan iznad, nudimo i <strong>Web Security Scanner Pro</strong> pretplatu koja otkljucava dodatne funkcije:</p>
+    <ul>
+      <li><strong>Neograniceni skenovi</strong> — nema rate limit-a od 5 skenova po 30 minuta</li>
+      <li><strong>Multi-page skeniranje</strong> — do 10 stranica po scan-u (crawler obilazi vas sajt, ne samo homepage)</li>
+      <li><strong>PDF izvestaji</strong> — profesionalni branded izvestaj koji mozete proslediti klijentu</li>
+      <li><strong>Istorija skeniranja</strong> — pregled i preuzimanje rezultata u zadnjih 30 dana</li>
+    </ul>
+    <p><strong>Cene</strong> (u USD, naplata po Lemon Squeezy kursu za vasu zemlju):</p>
+    <ul>
+      <li><strong>Pro Monthly</strong> — $9 USD mesecno, naplata svakog 30. dana</li>
+      <li><strong>Pro Yearly</strong> — $79 USD godisnje (~27% popust u odnosu na mesecni plan), naplata jednom godisnje</li>
+    </ul>
+    <p><strong>Besplatni trial:</strong> Svaka nova Pro pretplata pocinje sa <strong>7-dnevnim besplatnim trial periodom</strong>. Morate uneti karticu pri registraciji (tako sprecavamo zloupotrebu trial-a), ali niste naplaćeni dok trial ne istekne. Mozete otkazati bilo kada u toku trial-a i nece biti naplaćeno.</p>
+    <p><strong>Merchant of Record:</strong> Placanja obradjuje <strong>Lemon Squeezy Inc.</strong> kao formalni prodavac. To znaci:</p>
+    <ul>
+      <li>Transakcija je izmedju vas i Lemon Squeezy-ja, ne direktno izmedju vas i operatora Servisa</li>
+      <li>Lemon Squeezy izdaje racune koji su EU VAT compliant, automatski hendluje porez u 100+ zemalja</li>
+      <li>Vasu karticu i licne podatke za placanje vidi samo Lemon Squeezy (nikad nas)</li>
+      <li>Pristup customer portal-u za upravljanje pretplatom (otkazivanje, menjanje plana, pregled racuna) ide kroz Lemon Squeezy portal — link dobijate u svakom email-u sa potvrdom</li>
+    </ul>
+
+    <h2 id="tos12">12. Automatsko obnavljanje i otkazivanje</h2>
+    <p><strong>Automatsko obnavljanje:</strong> Pro pretplate se automatski obnavljaju na kraju svakog billing ciklusa. Mesecni plan se obnavlja svakih 30 dana, godisnji svakih 365. Ovo je standardno ponasanje za SaaS pretplate i u skladu je sa EU Consumer Rights Directive-om — vi ste svesno odabrali recurring plan pri kupovini.</p>
+    <p><strong>Email podsetnici:</strong> Pre svakog obnavljanja, Lemon Squeezy salje email obavestenje nekoliko dana unapred. Ako ne zelite dalje obnavljanje, imate dovoljno vremena da otkazete.</p>
+    <p><strong>Kako otkazati:</strong></p>
+    <ol>
+      <li>Otvorite bilo koji email sa potvrdom koji ste dobili od Lemon Squeezy-ja</li>
+      <li>Kliknite na link &quot;Manage subscription&quot; ili &quot;Customer portal&quot;</li>
+      <li>Logujte se email adresom koju ste koristili za kupovinu</li>
+      <li>Kliknite &quot;Cancel subscription&quot;</li>
+    </ol>
+    <p>Nakon otkazivanja, pristup Pro funkcijama <strong>ostaje aktivan do kraja trenutnog placenog perioda</strong>. To znaci: ako ste platili mesecni plan 1. aprila i otkazete 15. aprila, Pro funkcije rade do 30. aprila, a 1. maja se automatski prebacujete na free tier. Nema dodatnih naplata nakon otkazivanja.</p>
+
+    <h2 id="tos13">13. Refundacije</h2>
+    <p>Imamo zasebnu, detaljniju <strong><a href="./refund-policy.html">Politiku refundacije</a></strong> koju treba da procitate ako razmisljate o povraćaju novca. Ukratko:</p>
+    <ul>
+      <li><strong>14 dana pun refund</strong> za mesecni plan od datuma prve naplate (bez pitanja)</li>
+      <li><strong>30 dana pun refund</strong> za godisnji plan (bez pitanja)</li>
+      <li><strong>7-dnevni trial</strong> — ako otkazete tokom trial-a, nista nije naplaćeno (nema potrebe za refund zahtev)</li>
+      <li><strong>Posle navedenih rokova</strong> — zahtev se razmatra od slucaja do slucaja; fer pristup</li>
+    </ul>
+
+    <h2 id="tos14">14. Fair use za Pro funkcije</h2>
+    <p>Pro plan otkljucava &quot;neogranicene skenove&quot;, ali to je ograniceno na <strong>razuman obim za jednog korisnika</strong>. Primeri zloupotrebe koji krse fair use:</p>
+    <ul>
+      <li>Koriscenje jedne Pro pretplate kao shared servis za neograniceno korisnika (npr. embed-ovanje u drugi javno dostupan alat)</li>
+      <li>Skeniranje istog domena stotine puta u kratkom vremenu radi DoS-ovanja meti (SSRF zastita i rate limit ka cilju ionako hvataju ovo, ali povreda fair use je dodatni osnov za suspenziju)</li>
+      <li>Mass-scanning kao deo offensive security operacije bez dozvola za svaki meta</li>
+      <li>Koriscenje API-ja (kad bude dostupan) za scrape-ovanje treceg alata koji sam po sebi krsi neciji ToS</li>
+    </ul>
+    <p>U slucaju zloupotrebe, zadrzavamo pravo da <strong>suspendovanjem license_key-a prekinemo pristup</strong> bez refund-a. Za standardnu upotrebu (stotine skenova mesecno za jednog korisnika ili njegove klijente), nema ogranicenja.</p>
+
+    <h2 id="tos15">15. Kolacici i saglasnost</h2>
+    <p>Sajt koristi <strong>granularni cookie consent</strong> sa tri kategorije: neophodni (uvek aktivni), analiticki (opcioni), i reklamni (opcioni). Google AdSense skripte se <strong>ne ucitavaju</strong> dok eksplicitno ne odobrite reklamne kolacice. Mozete promeniti odluku u svakom trenutku klikom na "Podesavanja kolacica" u footer-u. Detaljniji opis kolacica po kategorijama nalazi se u <a href="./privacy.html#pp7">Politici privatnosti, sekcija 7</a>.</p>
+  </div>
+
+  <!-- ENGLISH -->
+  <div class="en">
+    <h1>Terms of Service</h1>
+    <p class="subtitle">Version 2026-04-13-v4 &middot; Last updated: April 13, 2026 &middot; <em>v4: public scan gallery (opt-in publishing, section 15 in privacy).</em></p>
+
+    <h2 id="tos1e">1. Acceptance of terms</h2>
+    <p>By using Web Security Scanner (the <strong>&quot;Service&quot;</strong>), you accept these terms in full. If you don't agree, please don't use the Service. Every scan requires you to explicitly confirm consent before it starts, and the version of these terms in effect at that moment is recorded in our audit log as legal proof of your agreement.</p>
+
+    <h2 id="tos2e">2. What the Service does</h2>
+    <p>The Service performs <strong>passive security checks</strong> on publicly-accessible websites. That means:</p>
+    <ul>
+      <li>We only read information publicly available through HTTP/HTTPS requests (headers, HTML, DNS records, SSL certificates)</li>
+      <li>We do not attempt to exploit vulnerabilities, send attack payloads, or bypass authentication</li>
+      <li>Every scan has a hard 180-second deadline and a rate limit of 5 scans per 30 minutes per IP address</li>
+      <li>SSRF protection prevents the Service from being abused to scan internal networks or cloud metadata endpoints</li>
+    </ul>
+
+    <h2 id="tos3e">3. Your responsibility as a user</h2>
+    <p><strong>You are responsible for having legal permission to scan any domain you enter into the Service.</strong> Acceptable use cases:</p>
+    <ul>
+      <li><strong>Your own site</strong> — if you own the domain or have administrative access</li>
+      <li><strong>A client's site</strong> — with written permission from the site owner (e.g., as part of a security audit engagement)</li>
+      <li><strong>A publicly accessible site for educational purposes</strong> — provided you use the results only for personal learning and do not overload the target with excessive scans</li>
+      <li><strong>CTF and bug bounty programs</strong> — where the program rules explicitly allow automated scanners</li>
+    </ul>
+    <p><strong>Prohibited uses of the Service:</strong></p>
+    <ul>
+      <li>Unauthorized scanning of third-party sites in preparation for an attack</li>
+      <li>Mass scanning as part of a reconnaissance campaign against multiple targets</li>
+      <li>Attempting to scan internal, private, or loopback addresses (SSRF protection will block it, but the attempt itself violates these terms)</li>
+      <li>Scanning sites whose owners have already notified us through our abuse-report procedure that they do not want to be scanned</li>
+    </ul>
+
+    <h2 id="tos4e">4. Consent on every scan</h2>
+    <p>Before starting each scan, you must explicitly check a checkbox confirming you have permission for that specific domain. This checkbox is documented legal consent, not just a UI decoration. When you confirm, the following gets recorded in our audit log:</p>
+    <ul>
+      <li>That you confirmed consent (<code>consent_accepted: true</code>)</li>
+      <li>The version of these terms in effect (<code>consent_version</code>)</li>
+      <li>Timestamp, the URL you submitted, and your pseudonymized IP address and User-Agent</li>
+    </ul>
+    <p>If a legal dispute ever arises over whether you had permission, we will use these records as evidence that you declared you had the right to scan.</p>
+
+    <h2 id="tos5e">5. What we store in our database</h2>
+    <p>Detailed information about what we store, for how long, and how we protect it is described in our <a href="./privacy.html">Privacy Policy</a>. In summary:</p>
+    <ul>
+      <li>URL, domain, and scan result are stored in our database for audit trail and later review by users</li>
+      <li>IP address and User-Agent are stored as SHA-256 hashes with a server-side salt (pseudonymization in the sense of GDPR Art. 4(5))</li>
+      <li>Audit log is append-only and retained for up to 90 days, except for rows flagged as legal evidence</li>
+      <li>A daily encrypted backup is stored on Cloudflare R2 offsite storage</li>
+    </ul>
+
+    <h2 id="tos6e">6. Rights of scanned site owners (abuse report)</h2>
+    <p>If you are the owner of a domain that was scanned without your permission, you can submit an abuse report through the &quot;Report abuse&quot; link in the footer or directly at the <a href="/abuse-report#form-en">abuse report page</a>. For every report:</p>
+    <ul>
+      <li>We review within 72 hours</li>
+      <li>If the report is legitimate, we add your domain to the block list — all future scans of that domain will be refused with HTTP 403</li>
+      <li>Related audit_log entries are flagged as legal evidence and retained indefinitely (unless takedown orders require otherwise)</li>
+      <li>If you leave contact email, we will notify you of the outcome</li>
+    </ul>
+
+    <h2 id="tos7e">7. Two scan modes — gate-before-scan model</h2>
+    <p>The Service offers <strong>two scan modes</strong>, separated by a strict server-side gate:</p>
+
+    <h3>7.1. Quick public scan (default, no verification)</h3>
+    <p>Triggered by clicking <strong>Quick public scan</strong>. Runs <strong>20 passive checks</strong> using only information any public visitor of the site already knows: SSL/TLS certificate, HTTP headers, public DNS records (SPF, DMARC, DNSSEC), homepage HTML, robots.txt, security.txt, well-known endpoints, performance, accessibility, GDPR detection, WHOIS, CT logs, Mozilla Observatory. Three SAFE+REDACTED checks (Information Disclosure, JavaScript Security, JWT Security) also run but replace exact values with the placeholder <em>"verify ownership to see exact data"</em>.</p>
+    <p>In this mode the scanner <strong>SENDS NO PROBES</strong> against private infrastructure. The target server will not see a single GET request for <code>/.env</code>, <code>/.git/config</code>, <code>/wp-admin/</code>, <code>/phpmyadmin/</code>, port scans, or anything a legitimate owner would treat as recon. Goal: a fast, stateless, non-compromising check that anyone can run without legal risk.</p>
+
+    <h3>7.2. Full scan (owners only, via wizard)</h3>
+    <p>Triggered by the <strong>🔓 Full scan (site owners)</strong> button. Opens a wizard with 3 steps:</p>
+    <ol>
+      <li><strong>Three explicit consents</strong> — every click is recorded in our audit log together with a pseudonymized IP hash:
+        <ul>
+          <li>Ownership / written authorization from the owner</li>
+          <li>Understanding that the scanner will send active probes against sensitive files, admin panels, database ports, and vulnerabilities — with full legal responsibility</li>
+          <li>Consent to 30-day storage of findings tied to your IP hash</li>
+        </ul>
+      </li>
+      <li><strong>Ownership verification</strong> — prove you control the domain through one of three methods:
+        <ul>
+          <li><strong>Meta tag</strong> in the <code>&lt;head&gt;</code> of the homepage</li>
+          <li><strong>File</strong> at <code>/.well-known/scanner-verify.txt</code></li>
+          <li><strong>DNS TXT record</strong> at <code>_scanner-verify.yourdomain.com</code></li>
+        </ul>
+      </li>
+      <li><strong>Recap and final confirmation</strong> — the wizard shows a summary of everything you approved. The button to start the full scan has a 3-second delay (anti-reflex measure) so the recap is actually read before clicking.</li>
+    </ol>
+    <p>Only after all 3 consents pass, ownership is verified, and the final confirmation is given does the scanner run <strong>10 additional active checks</strong>: sensitive files scan, admin panel detection, vulnerability scan, port scan, API security (GraphQL introspection, swagger), CORS analysis, dependency CVE check, subdomain enumeration, takeover detection, WordPress deep-pass.</p>
+    <p>Successful verification is valid for <strong>30 days</strong> per (domain, IP hash) combination. After expiry, you go through the wizard again. This policy exists to prevent the Service from being used as an exploit cheat sheet against sites owned by someone else.</p>
+    <p><strong>Privacy-by-design:</strong> the wizard table <code>scan_requests</code> only stores the creation date (DATE), with no timestamp, so even a complete database leak cannot reveal the exact time you clicked the consent checkboxes.</p>
+
+    <h2 id="tos8e">8. Limitation of liability</h2>
+    <p>The Service is provided <strong>&quot;as is&quot;</strong>, without warranties of any kind, express or implied. Specifically:</p>
+    <ul>
+      <li>We do not guarantee that all vulnerabilities will be discovered — the scanner is passive and cannot see what requires authentication or interactive probing</li>
+      <li>We do not guarantee accuracy of results for sites behind bot-protection challenge pages (Cloudflare, DataDome, etc.)</li>
+      <li>We are not liable for any damage arising from your use or inability to use the Service</li>
+      <li>We are not liable if your site slows down or crashes during a scan (it shouldn't — we use reasonable timeouts and rate limits, but theoretically possible)</li>
+    </ul>
+
+    <h2 id="tos9e">9. Changes to these terms</h2>
+    <p>We reserve the right to update these terms. When we do, we bump the version (<code>consent_version</code>) and every new scan will have to confirm the new version. Your prior consents remain valid in the audit log but do not retroactively apply to new legal terms.</p>
+
+    <h2 id="tos10e">10. Contact and disputes</h2>
+    <p>For any questions about these terms, contact us at <a href="mailto:kontakt@gradovi.rs">kontakt@gradovi.rs</a>. Security vulnerabilities: <a href="mailto:security@gradovi.rs">security@gradovi.rs</a>. Abuse reports: <a href="mailto:abuse@gradovi.rs">abuse@gradovi.rs</a>. Pro plan: <a href="mailto:pro@gradovi.rs">pro@gradovi.rs</a>. Any disputes are resolved under the law of the Republic of Serbia and ZZPL, except to the extent local regulations grant the user stronger rights.</p>
+
+    <h2 id="tos11e">11. Paid plans (Pro subscription)</h2>
+    <p>Alongside the free tier described above, we also offer <strong>Web Security Scanner Pro</strong>, a paid subscription that unlocks additional features:</p>
+    <ul>
+      <li><strong>Unlimited scans</strong> — no more 5 scans per 30 minutes rate limit</li>
+      <li><strong>Multi-page scanning</strong> — up to 10 pages per scan (crawler walks your site, not just the homepage)</li>
+      <li><strong>PDF reports</strong> — professional branded reports you can send to clients</li>
+      <li><strong>Scan history</strong> — review and re-download results from the last 30 days</li>
+    </ul>
+    <p><strong>Pricing</strong> (in USD, converted at Lemon Squeezy's rate for your country):</p>
+    <ul>
+      <li><strong>Pro Monthly</strong> — $9 USD per month, billed every 30 days</li>
+      <li><strong>Pro Yearly</strong> — $79 USD per year (~27% discount vs monthly), billed once a year</li>
+    </ul>
+    <p><strong>Free trial:</strong> Every new Pro subscription starts with a <strong>7-day free trial</strong>. You must enter a card at signup (that's how we prevent trial abuse), but you are not charged until the trial ends. You can cancel anytime during the trial and will not be charged.</p>
+    <p><strong>Merchant of Record:</strong> Payments are processed by <strong>Lemon Squeezy Inc.</strong> as the legal seller. That means:</p>
+    <ul>
+      <li>The transaction is between you and Lemon Squeezy, not directly between you and the operator of the Service</li>
+      <li>Lemon Squeezy issues EU VAT compliant invoices and automatically handles tax in 100+ countries</li>
+      <li>Your card and personal payment information is only seen by Lemon Squeezy (never by us)</li>
+      <li>Access to the customer portal for managing your subscription (cancellation, plan changes, invoice history) is through the Lemon Squeezy portal — the link is in every confirmation email</li>
+    </ul>
+
+    <h2 id="tos12e">12. Automatic renewal and cancellation</h2>
+    <p><strong>Automatic renewal:</strong> Pro subscriptions auto-renew at the end of each billing cycle. Monthly plans renew every 30 days, yearly every 365. This is standard behavior for SaaS subscriptions and complies with the EU Consumer Rights Directive — you consciously chose a recurring plan at checkout.</p>
+    <p><strong>Email reminders:</strong> Before each renewal, Lemon Squeezy sends an email notification a few days in advance. If you don't want to renew, you have enough time to cancel.</p>
+    <p><strong>How to cancel:</strong></p>
+    <ol>
+      <li>Open any confirmation email you received from Lemon Squeezy</li>
+      <li>Click the &quot;Manage subscription&quot; or &quot;Customer portal&quot; link</li>
+      <li>Log in with the email address you used for the purchase</li>
+      <li>Click &quot;Cancel subscription&quot;</li>
+    </ol>
+    <p>After cancellation, access to Pro features <strong>remains active until the end of the current paid period</strong>. That means: if you paid for a monthly plan on April 1 and cancel on April 15, Pro features work until April 30, and on May 1 you automatically fall back to the free tier. There are no additional charges after cancellation.</p>
+
+    <h2 id="tos13e">13. Refunds</h2>
+    <p>We have a separate, more detailed <strong><a href="./refund-policy.html">Refund Policy</a></strong> that you should read if you're considering a refund. In short:</p>
+    <ul>
+      <li><strong>14 days full refund</strong> for monthly plans from the date of first charge (no questions asked)</li>
+      <li><strong>30 days full refund</strong> for yearly plans (no questions asked)</li>
+      <li><strong>7-day trial</strong> — if you cancel during the trial, nothing is charged (no refund request needed)</li>
+      <li><strong>After those windows</strong> — requests are considered case by case; fair approach</li>
+    </ul>
+
+    <h2 id="tos14e">14. Fair use for Pro features</h2>
+    <p>The Pro plan unlocks &quot;unlimited scans&quot;, but that is limited to <strong>a reasonable volume for a single user</strong>. Examples of abuse that violate fair use:</p>
+    <ul>
+      <li>Using one Pro subscription as a shared service for unlimited users (e.g., embedding it in another publicly-accessible tool)</li>
+      <li>Scanning the same domain hundreds of times in a short window in order to DoS the target (SSRF protection and target-side rate limits will catch this anyway, but fair-use violation is an additional basis for suspension)</li>
+      <li>Mass-scanning as part of offensive security operations without permission for each target</li>
+      <li>Using the API (when it becomes available) to scrape a third-party tool that itself violates someone's ToS</li>
+    </ul>
+    <p>In cases of abuse, we reserve the right to <strong>suspend access by revoking the license_key</strong> without a refund. For standard usage (hundreds of scans per month for a single user or their clients), there are no limits.</p>
+
+    <h2 id="tos15e">15. Cookies and consent</h2>
+    <p>The site uses a <strong>granular cookie consent</strong> system with three categories: essential (always active), analytics (optional), and advertising (optional). Google AdSense scripts <strong>do not load</strong> until you explicitly approve advertising cookies. You can change your decision at any time by clicking "Cookie Settings" in the footer. A detailed description of cookies by category is available in the <a href="./privacy.html#pp7e">Privacy Policy, section 7</a>.</p>
+  </div>
+
+  </main>
+</div>
+<script src="./blog-common.js" defer></script>
+</body>
+</html>

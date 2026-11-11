@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Rights / Prava korisnika — Web Security Scanner · GDPR · DSAR</title>
+  <meta name="description" content="Your rights as a Web Security Scanner user: data access, erasure, portability, objection. GDPR Articles 12-22. · Vasa prava: pristup podacima, brisanje, prenosivost, prigovor. GDPR clan 12-22.">
+  <meta name="keywords" content="prava korisnika, user rights, GDPR prava, pravo na pristup, pravo na brisanje, pravo na prenosivost, DSAR, data subject rights, right to access, right to erasure, data portability, GDPR Article 15, GDPR Article 17, GDPR Article 20">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://security-skener.gradovi.rs/user-rights.html">
+  <link rel="alternate" hreflang="sr" href="https://security-skener.gradovi.rs/user-rights.html">
+  <link rel="alternate" hreflang="x-default" href="https://security-skener.gradovi.rs/user-rights.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="User Rights / Prava korisnika">
+  <meta property="og:description" content="Data access, erasure, portability, objection. GDPR 12-22. · Pristup, brisanje, prenosivost, prigovor. GDPR 12-22.">
+  <meta property="og:url" content="https://security-skener.gradovi.rs/user-rights.html">
+  <meta property="og:site_name" content="Web Security Scanner">
+  <meta property="og:locale" content="sr_RS">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="User Rights / Prava korisnika">
+  <meta name="twitter:description" content="GDPR user rights. · GDPR prava korisnika.">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./blog-common.css">
+</head>
+<body>
+<div class="blog-layout">
+  <aside class="timeline-nav">
+    <div class="sr"><div class="timeline-title">Sadrzaj</div><ol id="timeline-sr"></ol></div>
+    <div class="en"><div class="timeline-title">Contents</div><ol id="timeline-en"></ol></div>
+  </aside>
+  <main class="blog-content">
+
+  <!-- SERBIAN -->
+  <div class="sr">
+    <h1>Prava korisnika</h1>
+    <p class="subtitle">Verzija 2026-04-13-v4 &middot; Poslednje azuriranje: 13. april 2026.</p>
+
+    <p>Ovaj dokument objasnjava konkretno koja prava imate kao korisnik Web Security Scannera i kako da ih ostvarite. Za opsti pregled GDPR prava, pogledajte nas <a href="./blog-gdpr-rights.html">blog clanak o GDPR pravima</a>.</p>
+
+    <h2 id="ur1">1. Koja prava imate</h2>
+    <p>Ako se nalazite u Evropskom ekonomskom prostoru (EEA), imate sledeca prava po GDPR-u:</p>
+    <ul>
+      <li><strong>Pravo na pristup (Art. 15)</strong> — mozete zatraziti kopiju svih podataka koje imamo o vama</li>
+      <li><strong>Pravo na ispravku (Art. 16)</strong> — ako su podaci netacni</li>
+      <li><strong>Pravo na brisanje (Art. 17)</strong> — "pravo da se bude zaboravljen"</li>
+      <li><strong>Pravo na ogranicavanje obrade (Art. 18)</strong></li>
+      <li><strong>Pravo na prenosivost podataka (Art. 20)</strong> — mozete zatraziti export u masinski citljivom formatu</li>
+      <li><strong>Pravo na prigovor (Art. 21)</strong> — mozete prigovoriti obradi na osnovu legitimnog interesa</li>
+    </ul>
+
+    <h2 id="ur2">2. Sta KONKRETNO imamo o vama</h2>
+    <p>Web Security Scanner je dizajniran po principu <strong>minimizacije podataka</strong>. Evo tacno sta cuvamo:</p>
+    <ul>
+      <li><strong>SHA-256 hash vase IP adrese</strong> (ne raw IP) — ne mozemo da ga "dekodiramo" nazad u vasu IP adresu</li>
+      <li><strong>SHA-256 hash vaseg User-Agent-a</strong></li>
+      <li><strong>URL koji ste skenirali</strong> i rezultat skeniranja</li>
+      <li><strong>Consent flag</strong> — da ste prihvatili uslove pre skeniranja</li>
+      <li><strong>Ako ste kupili Pro plan:</strong> email adresa, license key, status pretplate (primljeno od Lemon Squeezy)</li>
+    </ul>
+    <p><strong>Nemamo:</strong> vasu raw IP adresu, ime, prezime, adresu, telefon, lozinku, istoriju pregledanja. Ne koristimo kolacice za pracenje osim ako eksplicitno odobrite (cookie consent banner).</p>
+
+    <h2 id="ur3">3. Kako da ostvarite svoja prava</h2>
+    <p>Posaljite zahtev na email naveden u <a href="./privacy.html#pp10">Politici privatnosti, sekcija 10</a>. Zahtev mora da sadrzi:</p>
+    <ul>
+      <li><strong>Vasu IP adresu</strong> u trenutku skeniranja (potrebna da bismo izracunali hash i pronasli vase redove)</li>
+      <li><strong>Priblizno vreme</strong> skeniranja (dan je dovoljan)</li>
+      <li><strong>Vrstu zahteva</strong>: pristup, brisanje, ispravka, ili export</li>
+    </ul>
+    <p><strong>Zasto trebamo vasu IP adresu?</strong> Zato sto je cuvamo samo kao hash. Bez originalne IP adrese ne mozemo da izracunamo hash i identifikujemo vase redove u bazi. Ovo je posledica naseg privacy-by-design pristupa.</p>
+    <p><strong>Rok za odgovor:</strong> 30 dana od prijema zahteva (GDPR Art. 12).</p>
+
+    <h2 id="ur4">4. Brisanje podataka</h2>
+    <p>Na vas zahtev brisemo:</p>
+    <ul>
+      <li>Sve <code>scans</code> redove koji odgovaraju vasem IP hash-u</li>
+      <li>Sve <code>audit_log</code> redove koji odgovaraju vasem IP hash-u (osim onih koji su <code>flagged=true</code> za pravne svrhe)</li>
+      <li>Sve <code>verified_domains</code> redove vezane za vas IP hash</li>
+      <li>Sve <code>scan_requests</code> redove vezane za vas IP hash</li>
+    </ul>
+    <p><strong>Sta NE brisemo:</strong> redove oznacene sa <code>flagged=true</code> u audit_log-u. Ovo su redovi koji su vezani za potvrdjene prijave zloupotrebe i cuvaju se kao pravni dokaz. Ovaj izuzetak je dozvoljen po GDPR Art. 17(3)(e) — uspostavljanje, ostvarivanje ili odbrana pravnih zahteva.</p>
+
+    <h2 id="ur5">5. Kolacici — vasa kontrola</h2>
+    <p>Sajt koristi granularni cookie consent sa tri kategorije. Mozete promeniti odluku u svakom trenutku klikom na <strong>"Podesavanja kolacica"</strong> u footer-u bilo koje stranice. Ako odbijete sve osim neophodnih, nikakvi tracking kolacici se ne postavljaju i nikakvi podaci se ne salju Google-u. Detaljniji opis u <a href="./privacy.html#pp7">Politici privatnosti, sekcija 7</a>.</p>
+
+    <h2 id="ur6">6. Automatizovano odlucivanje (cl. 38 ZZPL)</h2>
+    <p>Ovaj servis <strong>NE koristi automatizovano odlucivanje</strong> koje proizvodi pravne posledice po vas ili znacajno utice na vas polozaj. Skeniranje je tehnicka analiza sajta, ne odlucivanje o vama. Risk score (A-F ocena) je informativni alat.</p>
+
+    <h2 id="ur7">7. Pravo na prigovor (cl. 37 ZZPL)</h2>
+    <p>Imate pravo da podnesete <strong>prigovor na obradu</strong> vasih podataka koja se zasniva na legitimnom interesu (audit log). Prigovor posaljite na <a href="mailto:kontakt@gradovi.rs">kontakt@gradovi.rs</a>. Ako ne dokazemo da postoje zakonski razlozi za obradu koji pretezsu nad vasim interesima, prekinucemo obradu vasih podataka.</p>
+
+    <h2 id="ur8">8. Prenosivost podataka (cl. 36 ZZPL)</h2>
+    <p>Imate pravo da zatrazite kopiju vasih podataka u <strong>masinski citljivom formatu</strong>. Na vas zahtev, dostavljamo podatke u JSON ili CSV formatu putem email-a. Zahtev posaljite na <a href="mailto:kontakt@gradovi.rs">kontakt@gradovi.rs</a> sa vasom IP adresom i pribliznim vremenom skeniranja.</p>
+
+    <h2 id="ur9">9. Pravo na zalbu nadleznom organu</h2>
+    <p>Ako smatrate da vasa prava nisu ispostovana, imate pravo da podnesete prituzbu:</p>
+    <p><strong>Poverenik za informacije od javnog znacaja i zastitu podataka o licnosti</strong></p>
+    <ul>
+      <li>Adresa: Bulevar kralja Aleksandra 15, 11120 Beograd</li>
+      <li>Telefon: +381 11 3408 900</li>
+      <li>Email: <a href="mailto:office@poverenik.rs">office@poverenik.rs</a></li>
+      <li>Web: <a href="https://www.poverenik.rs" target="_blank" rel="noopener">poverenik.rs</a></li>
+      <li>Radno vreme: 7:30-15:30</li>
+    </ul>
+    <p>Kancelarije van sedista:</p>
+    <ul>
+      <li>Novi Sad: Vojvode Supljikca 21, tel: +381 21 2107 618</li>
+      <li>Nis: Generala Milojka Lesjanina 39, tel: +381 18 4151 618</li>
+      <li>Kragujevac: Liceja Knezevine Srbije 1, tel: +381 34 370 222</li>
+    </ul>
+    <p>Podnosenje prituzbe Povereniku ne utice na vase pravo da pokrenete i sudski postupak (cl. 84 ZZPL). Rok Poverenika za postupanje: 60 dana.</p>
+    <p><strong>EU:</strong> nadlezni Data Protection Authority u vasoj zemlji — <a href="https://edpb.europa.eu/about-edpb/about-edpb/members_en" target="_blank" rel="noopener">lista DPA-ova</a></p>
+
+    <h2 id="ur10">10. Kontakt rukovaoca</h2>
+    <p>Za sva pitanja u vezi sa zastitom podataka:</p>
+    <ul>
+      <li>Email: <a href="mailto:kontakt@gradovi.rs">kontakt@gradovi.rs</a></li>
+      <li>Operater: Toske-Programer (<a href="https://toske-programer.web.app" target="_blank" rel="noopener">toske-programer.web.app</a>)</li>
+      <li>Lokacija: Srbija</li>
+    </ul>
+
+    <h2 id="ur11">11. Povezani dokumenti</h2>
+    <ul>
+      <li><a href="./privacy.html">Politika privatnosti</a> — kompletni detalji o obradi podataka</li>
+      <li><a href="./privacy.html#pp14">Istorija verzija politike</a> — sve promene po datumima, sta je bilo aktivno kada</li>
+      <li><a href="./terms.html">Uslovi koriscenja</a> — pravila koriscenja servisa</li>
+      <li><a href="./blog-gdpr-rights.html">Blog: GDPR prava (opsti vodic)</a> — edukativni clanak o GDPR pravima generalno</li>
+    </ul>
+  </div>
+
+  <!-- ENGLISH -->
+  <div class="en">
+    <h1>User Rights</h1>
+    <p class="subtitle">Version 2026-04-13-v4 &middot; Last updated: April 13, 2026.</p>
+
+    <p>This document explains specifically what rights you have as a Web Security Scanner user and how to exercise them. For a general GDPR rights overview, see our <a href="./blog-gdpr-rights.html">blog article on GDPR rights</a>.</p>
+
+    <h2 id="ur1e">1. Your rights</h2>
+    <p>If you are located in the European Economic Area (EEA), you have the following rights under GDPR:</p>
+    <ul>
+      <li><strong>Right of access (Art. 15)</strong> — you can request a copy of all data we hold about you</li>
+      <li><strong>Right to rectification (Art. 16)</strong> — if data is inaccurate</li>
+      <li><strong>Right to erasure (Art. 17)</strong> — "right to be forgotten"</li>
+      <li><strong>Right to restriction of processing (Art. 18)</strong></li>
+      <li><strong>Right to data portability (Art. 20)</strong> — you can request an export in machine-readable format</li>
+      <li><strong>Right to object (Art. 21)</strong> — you can object to processing based on legitimate interest</li>
+    </ul>
+
+    <h2 id="ur2e">2. What we ACTUALLY have about you</h2>
+    <p>Web Security Scanner is built on a <strong>data minimization</strong> principle. Here is exactly what we store:</p>
+    <ul>
+      <li><strong>SHA-256 hash of your IP address</strong> (not raw IP) — we cannot "decode" it back to your IP address</li>
+      <li><strong>SHA-256 hash of your User-Agent</strong></li>
+      <li><strong>URL you scanned</strong> and the scan result</li>
+      <li><strong>Consent flag</strong> — that you accepted the terms before scanning</li>
+      <li><strong>If you purchased a Pro plan:</strong> email address, license key, subscription status (received from Lemon Squeezy)</li>
+    </ul>
+    <p><strong>We do NOT have:</strong> your raw IP address, name, surname, address, phone number, password, or browsing history. We do not use tracking cookies unless you explicitly approve them (cookie consent banner).</p>
+
+    <h2 id="ur3e">3. How to exercise your rights</h2>
+    <p>Send a request to the email listed in <a href="./privacy.html#pp10e">Privacy Policy, section 10</a>. The request must include:</p>
+    <ul>
+      <li><strong>Your IP address</strong> at the time of scanning (needed so we can compute the hash and find your rows)</li>
+      <li><strong>Approximate time</strong> of scanning (day is sufficient)</li>
+      <li><strong>Type of request</strong>: access, erasure, rectification, or export</li>
+    </ul>
+    <p><strong>Why do we need your IP address?</strong> Because we only store it as a hash. Without the original IP address, we cannot compute the hash and identify your rows in the database. This is a consequence of our privacy-by-design approach.</p>
+    <p><strong>Response deadline:</strong> 30 days from receipt of request (GDPR Art. 12).</p>
+
+    <h2 id="ur4e">4. Data erasure</h2>
+    <p>Upon your request, we delete:</p>
+    <ul>
+      <li>All <code>scans</code> rows matching your IP hash</li>
+      <li>All <code>audit_log</code> rows matching your IP hash (except those marked <code>flagged=true</code> for legal purposes)</li>
+      <li>All <code>verified_domains</code> rows tied to your IP hash</li>
+      <li>All <code>scan_requests</code> rows tied to your IP hash</li>
+    </ul>
+    <p><strong>What we do NOT delete:</strong> rows marked <code>flagged=true</code> in audit_log. These are rows tied to confirmed abuse reports and are retained as legal evidence. This exception is permitted under GDPR Art. 17(3)(e) — establishment, exercise, or defense of legal claims.</p>
+
+    <h2 id="ur5e">5. Cookies — your control</h2>
+    <p>The site uses granular cookie consent with three categories. You can change your decision at any time by clicking <strong>"Cookie Settings"</strong> in the footer of any page. If you reject all except essential, no tracking cookies are set and no data is sent to Google. Details in <a href="./privacy.html#pp7e">Privacy Policy, section 7</a>.</p>
+
+    <h2 id="ur6e">6. Automated decision-making (Art. 38 ZZPL)</h2>
+    <p>This service <strong>does NOT use automated decision-making</strong> that produces legal effects or significantly affects your position. Scanning is a technical analysis of websites, not decision-making about you. The risk score (A-F grade) is an informational tool.</p>
+
+    <h2 id="ur7e">7. Right to object (Art. 37 ZZPL)</h2>
+    <p>You have the right to <strong>object to processing</strong> of your data based on legitimate interest (audit log). Send your objection to <a href="mailto:kontakt@gradovi.rs">kontakt@gradovi.rs</a>. Unless we demonstrate compelling legitimate grounds for processing which override your interests, we will cease processing your data.</p>
+
+    <h2 id="ur8e">8. Data portability (Art. 36 ZZPL)</h2>
+    <p>You have the right to receive your data in a <strong>machine-readable format</strong>. Upon request, we provide data in JSON or CSV format via email. Send your request to <a href="mailto:kontakt@gradovi.rs">kontakt@gradovi.rs</a> with your IP address and approximate scan time.</p>
+
+    <h2 id="ur9e">9. Right to complain to the supervisory authority</h2>
+    <p>If you believe your rights have not been respected, you have the right to file a complaint:</p>
+    <p><strong>Commissioner for Information of Public Importance and Personal Data Protection</strong></p>
+    <ul>
+      <li>Address: Bulevar kralja Aleksandra 15, 11120 Belgrade, Serbia</li>
+      <li>Phone: +381 11 3408 900</li>
+      <li>Email: <a href="mailto:office@poverenik.rs">office@poverenik.rs</a></li>
+      <li>Web: <a href="https://www.poverenik.rs" target="_blank" rel="noopener">poverenik.rs</a></li>
+    </ul>
+    <p>Filing a complaint does not affect your right to initiate court proceedings (Art. 84 ZZPL). Commissioner's deadline: 60 days.</p>
+    <p><strong>EU:</strong> the competent Data Protection Authority in your country — <a href="https://edpb.europa.eu/about-edpb/about-edpb/members_en" target="_blank" rel="noopener">list of DPAs</a></p>
+
+    <h2 id="ur10e">10. Controller contact</h2>
+    <p>For any data protection questions:</p>
+    <ul>
+      <li>Email: <a href="mailto:kontakt@gradovi.rs">kontakt@gradovi.rs</a></li>
+      <li>Operator: Toske-Programer (<a href="https://toske-programer.web.app" target="_blank" rel="noopener">toske-programer.web.app</a>)</li>
+      <li>Location: Serbia</li>
+    </ul>
+
+    <h2 id="ur11e">11. Related documents</h2>
+    <ul>
+      <li><a href="./privacy.html">Privacy Policy</a> — complete details on data processing</li>
+      <li><a href="./privacy.html#pp14e">Policy version history</a> — all changes by date, what was active when</li>
+      <li><a href="./terms.html">Terms of Service</a> — rules for using the service</li>
+      <li><a href="./blog-gdpr-rights.html">Blog: GDPR rights (general guide)</a> — educational article on GDPR rights in general</li>
+    </ul>
+  </div>
+
+  </main>
+</div>
+<script src="./cookie-consent.js" defer></script>
+<script src="./blog-common.js" defer></script>
+</body>
+</html>

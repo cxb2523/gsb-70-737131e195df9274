@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Website Performance Guide — Core Web Vitals &amp; Speed Optimization / Performanse sajta — Kompletni vodic za brzinu · CWV · Cache · CDN</title>
+  <meta name="description" content="Complete website performance guide: Core Web Vitals, image optimization, cache, compression, CDN, lazy loading. 6 detailed tutorials + 9 automated checks. · Kompletni vodic za performanse sajta: Core Web Vitals, optimizacija slika, cache, kompresija, CDN, lazy loading. 6 detaljnih vodica i 9 automatskih provera.">
+  <meta name="keywords" content="performanse sajta, brzina sajta, brzina web sajta, ubrzanje sajta, optimizacija brzine, sporo ucitavanje, kako ubrzati sajt, optimizacija slika, Core Web Vitals, LCP, CLS, INP, cache, CDN, lazy loading, Gzip, Brotli, website performance, web performance, page speed, website speed, site speed, how to speed up website, speed optimization, image optimization, caching, compression, content delivery network, PageSpeed Insights, Lighthouse, web vitals, performance tuning, fast website, slow website fix">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://security-skener.gradovi.rs/blog-performance">
+  <link rel="alternate" hreflang="sr" href="https://security-skener.gradovi.rs/blog-performance">
+  <link rel="alternate" hreflang="x-default" href="https://security-skener.gradovi.rs/blog-performance">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Website Performance Guide / Performanse sajta — Kompletni vodic">
+  <meta property="og:description" content="Core Web Vitals, image optimization, cache, compression, CDN, lazy loading. 6 detailed tutorials. · Core Web Vitals, optimizacija slika, cache, kompresija, CDN, lazy loading. 6 detaljnih vodica.">
+  <meta property="og:url" content="https://security-skener.gradovi.rs/blog-performance">
+  <meta property="og:site_name" content="Web Security Scanner">
+  <meta property="og:locale" content="sr_RS">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta property="og:image" content="https://security-skener.gradovi.rs/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Website Performance Guide / Performanse sajta — Kompletni vodic — Web Security Scanner">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Website Performance Guide / Performanse sajta — Kompletni vodic">
+  <meta name="twitter:description" content="Core Web Vitals, images, cache, compression, CDN, lazy loading. · Core Web Vitals, slike, cache, kompresija, CDN, lazy loading.">
+  <meta name="twitter:image" content="https://security-skener.gradovi.rs/og-image.png">
+  <script type="application/ld+json">
+  {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+          {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://security-skener.gradovi.rs/"
+          },
+          {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Performanse sajta — Kompletni vodic za brzinu",
+              "item": "https://security-skener.gradovi.rs/blog-performance"
+          }
+      ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Performanse sajta — Kompletni vodic za brzinu",
+    "author": {"@type": "Person", "name": "Toske", "url": "https://toske-programer.web.app"},
+    "publisher": {"@type": "Organization", "name": "Web Security Scanner", "logo": {"@type": "ImageObject", "url": "https://security-skener.gradovi.rs/logo.png"}},
+    "datePublished": "2026-04-08",
+    "dateModified": "2026-04-09",
+    "description": "Complete website performance guide: Core Web Vitals, image optimization, cache, compression, CDN, lazy loading. · Kompletni vodic za performanse sajta: Core Web Vitals, optimizacija slika, cache, kompresija, CDN, lazy loading.",
+    "inLanguage": ["sr-RS", "en-US"],
+    "keywords": "performanse sajta, brzina sajta, Core Web Vitals, LCP, CLS, INP, cache, CDN, lazy loading, website performance, page speed, image optimization",
+    "mainEntityOfPage": {"@type": "WebPage", "@id": "https://security-skener.gradovi.rs/blog-performance"}
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {"@type": "Question", "name": "Sta su Core Web Vitals?", "acceptedAnswer": {"@type": "Answer", "text": "Core Web Vitals su 3 Google metrike za korisnicko iskustvo: LCP (brzina ucitavanja, cilj <2.5s), CLS (vizuelna stabilnost, cilj <0.1), i INP (odzivnost na interakcije, cilj <200ms). Od 2021. su faktor rangiranja."}},
+      {"@type": "Question", "name": "Koliko brzina sajta utice na konverzije?", "acceptedAnswer": {"@type": "Answer", "text": "Svaka sekunda kasnjenja smanjuje konverzije za 7%. Amazon je utvrdio da bi 100ms sporije ucitavanje kostalo 1% prodaje godisnje. 53% mobilnih korisnika napusta sajt posle 3 sekunde."}},
+      {"@type": "Question", "name": "Sta je bolje, Gzip ili Brotli kompresija?", "acceptedAnswer": {"@type": "Answer", "text": "Brotli je 15-25% efikasniji od Gzip-a za tekstualne resurse. Podrzava ga 97%+ modernih browsera. Preporucujemo Brotli kao primarni, sa Gzip fallback-om."}},
+      {"@type": "Question", "name": "Da li mi treba CDN?", "acceptedAnswer": {"@type": "Answer", "text": "Ako imate posetioce iz razlicitih regiona, CDN smanjuje latenciju za 50-70%. Cloudflare nudi besplatan tier koji ukljucuje CDN, SSL i osnovnu DDoS zastitu."}}
+    ]
+  }
+  </script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./blog-common.css">
+  <style>
+    .article-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+    .article-card { background: #12152a; border: 1px solid #252a4a; border-radius: 10px; padding: 1.2rem; transition: all 0.2s; text-decoration: none; display: block; }
+    .article-card:hover { border-color: #6c63ff; transform: translateY(-2px); box-shadow: 0 4px 20px rgba(108,99,255,0.15); }
+    .article-card h3 { color: #e8eaf6; font-size: 0.95rem; font-weight: 700; margin-bottom: 0.4rem; }
+    .article-card p { color: #7b83a6; font-size: 0.82rem; margin: 0; line-height: 1.5; }
+    .article-card .card-tag { display: inline-block; background: #1a1e38; color: #6c63ff; font-size: 0.7rem; font-weight: 600; padding: 2px 8px; border-radius: 4px; margin-bottom: 0.5rem; }
+  </style>
+</head>
+<body>
+<div class="blog-layout">
+  <aside class="timeline-nav">
+    <div class="sr"><div class="timeline-title">Sadrzaj</div><ol id="timeline-sr"></ol></div>
+    <div class="en"><div class="timeline-title">Contents</div><ol id="timeline-en"></ol></div>
+  </aside>
+  <main class="blog-content">
+
+  <!-- SERBIAN -->
+  <div class="sr">
+    <h1>Performanse sajta &mdash; Kompletni vodic</h1>
+    <p class="subtitle">Sve o brzini ucitavanja: Core Web Vitals, optimizacija i 6 detaljnih vodicaa</p>
+    <p class="direct-answer">Brzina ucitavanja sajta direktno utice na tri stvari: Google rangiranje (Core Web Vitals su zvanicni ranking faktor od juna 2021), konverzije i zadrzavanje posetilaca. Ovaj vodic pokriva Core Web Vitals, optimizaciju slika, cache, kompresiju, CDN i lazy loading kroz 6 detaljnih tutorijala.</p>
+
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-num">53%</div><div class="stat-label">Korisnika napusta sajt posle 3s</div></div>
+      <div class="stat-card"><div class="stat-num">7%</div><div class="stat-label">Manje konverzija po sekundi kasnjenja</div></div>
+      <div class="stat-card"><div class="stat-num">6</div><div class="stat-label">Detaljnih vodicaa</div></div>
+      <div class="stat-card"><div class="stat-num">9</div><div class="stat-label">Performance provera u skeneru</div></div>
+    </div>
+
+    <h2 id="perf1">1. Zasto je brzina sajta bitna?</h2>
+    <p>Brzina ucitavanja vaseg sajta direktno utice na tri kljucna aspekta vase online prisutnosti:</p>
+    <ul>
+      <li><strong>Konverzije</strong> — istrazivanja pokazuju da svaka sekunda kasnjenja u ucitavanju smanjuje konverzije za 7%. Amazon je utvrdio da bi 100ms sporije ucitavanje kostalo 1% prodaje godisnje.</li>
+      <li><strong>SEO rangiranje</strong> — Google koristi brzinu sajta kao direktan faktor rangiranja. Od 2021. godine, Core Web Vitals su zvanican deo algoritma pretrage.</li>
+      <li><strong>Korisnicko iskustvo (UX)</strong> — 53% mobilnih korisnika napusta sajt koji se ucitava duze od 3 sekunde. Brz sajt znaci zadovoljne posetioce koji se vracaju.</li>
+    </ul>
+
+    <div class="callout callout-danger"><strong>Amazon statistika:</strong> 100ms sporije ucitavanje = 1% manje prodaje godisnje. Za Amazon to znaci gubitak od $1.6 milijardi godisnje.</div>
+
+    <h2 id="perf2">2. Core Web Vitals &mdash; kljucne metrike</h2>
+    <p>Google je definisao tri kljucne metrike koje mere korisnicko iskustvo na sajtu:</p>
+    <ul>
+      <li><strong>LCP (Largest Contentful Paint)</strong> — meri koliko brzo se ucitava najveci vidljivi element na stranici (slika, video, blok teksta). Cilj: ispod 2.5 sekunde.</li>
+      <li><strong>CLS (Cumulative Layout Shift)</strong> — meri vizuelnu stabilnost stranice, tj. koliko se elementi pomeraju tokom ucitavanja. Cilj: ispod 0.1. Fiksne dimenzije za slike i oglase resavaju vecinu problema.</li>
+      <li><strong>INP (Interaction to Next Paint)</strong> — meri odzivnost stranice na korisnicke interakcije (klikove, tapove, unos teksta). Cilj: ispod 200 milisekundi. Zamenio je stariju metriku FID od marta 2024.</li>
+    </ul>
+    <table>
+      <tr><th>Metrika</th><th>Dobar</th><th>Treba poboljsati</th><th>Los</th></tr>
+      <tr><td>LCP</td><td>&lt; 2.5s</td><td>2.5s &ndash; 4s</td><td>&gt; 4s</td></tr>
+      <tr><td>CLS</td><td>&lt; 0.1</td><td>0.1 &ndash; 0.25</td><td>&gt; 0.25</td></tr>
+      <tr><td>INP</td><td>&lt; 200ms</td><td>200ms &ndash; 500ms</td><td>&gt; 500ms</td></tr>
+    </table>
+    <p>Ove metrike mozete pratiti u Google Search Console, pod odeljkom "Core Web Vitals".</p>
+
+    <h2 id="perf3">3. Tehnike optimizacije brzine</h2>
+    <p>Konkretni koraci koji mogu dramaticno ubrzati vas sajt:</p>
+    <ul>
+      <li><strong>Kompresija slika</strong> — koristite moderne formate poput WebP ili AVIF umesto PNG/JPEG. Alati poput Squoosh ili TinyPNG mogu smanjiti velicinu slika za 60-80% bez vidljivog gubitka kvaliteta.</li>
+      <li><strong>Browser caching</strong> — postavite Cache-Control i Expires headere da browser cuva staticke resurse (CSS, JS, slike) lokalno, umesto da ih preuzima pri svakoj poseti.</li>
+      <li><strong>Lazy loading</strong> — ucitavajte slike i iframe elemente tek kada korisnik skroluje do njih. Jednostavno dodajte <code>loading="lazy"</code> atribut na img i iframe tagove.</li>
+      <li><strong>CDN (Content Delivery Network)</strong> — distribuirajte sadrzaj na servere sirom sveta. Posetilac dobija sadrzaj sa najblizeg servera, sto dramaticno smanjuje latenciju.</li>
+      <li><strong>Minifikacija CSS i JS</strong> — uklonite nepotrebne razmake, komentare i nekorisceni kod. Alati poput Terser (JS) i cssnano (CSS) automatizuju ovaj proces.</li>
+      <li><strong>Gzip/Brotli kompresija</strong> — omogucite kompresiju na serveru da smanjite velicinu prenosa podataka za 70-90%.</li>
+    </ul>
+
+    <h2 id="perf4">4. Alati za merenje performansi</h2>
+    <p>Koristite ove alate za analizu i pracenje brzine vaseg sajta:</p>
+    <ul>
+      <li><strong>Google Lighthouse</strong> — ugraden u Chrome DevTools (F12 > Lighthouse tab). Daje sveobuhvatan izvestaj o performansama, pristupacnosti, SEO-u i najboljim praksama sa ocenom od 0 do 100.</li>
+      <li><strong>PageSpeed Insights</strong> — Google-ov online alat koji analizira stranicu i daje preporuke. Prikazuje i realne podatke korisnika (CrUX) i laboratorijske testove.</li>
+      <li><strong>WebPageTest</strong> — napredniji alat koji omogucava testiranje sa razlicitih lokacija, browsera i brzina konekcije. Pruza detaljan waterfall dijagram ucitavanja.</li>
+      <li><strong>GTmetrix</strong> — kombinuje podatke iz razlicitih izvora i prikazuje istoriju performansi tokom vremena.</li>
+    </ul>
+
+    <h2 id="perf5">5. Nasi detaljni vodici</h2>
+    <p>Svaki aspekt performansi smo obradili u posebnom vodicu:</p>
+    <div class="article-cards">
+      <a href="./blog-perf-cwv.html" class="article-card">
+        <span class="card-tag">Metrike</span>
+        <h3>Core Web Vitals</h3>
+        <p>LCP, CLS, INP detaljno: kako meriti, optimizovati i pratiti u Search Console.</p>
+      </a>
+      <a href="./blog-perf-images.html" class="article-card">
+        <span class="card-tag">Slike</span>
+        <h3>Optimizacija slika</h3>
+        <p>WebP, AVIF, srcset, lazy loading, CDN za slike, Squoosh, width/height za CLS.</p>
+      </a>
+      <a href="./blog-perf-cache.html" class="article-card">
+        <span class="card-tag">Cache</span>
+        <h3>HTTP Caching</h3>
+        <p>Cache-Control, ETag, CDN cache, Service Worker, cache-busting strategije.</p>
+      </a>
+      <a href="./blog-perf-compression.html" class="article-card">
+        <span class="card-tag">Kompresija</span>
+        <h3>Gzip i Brotli</h3>
+        <p>HTTP kompresija: Gzip vs Brotli, konfiguracija za Nginx/Apache/Express, benchmarks.</p>
+      </a>
+      <a href="./blog-perf-cdn.html" class="article-card">
+        <span class="card-tag">CDN</span>
+        <h3>Content Delivery Network</h3>
+        <p>Cloudflare, AWS CloudFront, Vercel Edge. Setup, DDoS zastita, cache invalidation.</p>
+      </a>
+      <a href="./blog-perf-lazy.html" class="article-card">
+        <span class="card-tag">Loading</span>
+        <h3>Lazy Loading</h3>
+        <p>Native lazy loading, Intersection Observer, code splitting, fetchpriority atribut.</p>
+      </a>
+    </div>
+
+    <h2 id="perf6">6. Sta nas skener meri</h2>
+    <p>Nas <a href="./index.html">Web Security Scanner</a> proverava 9 aspekata performansi:</p>
+    <ul>
+      <li>TTFB (Time to First Byte) &mdash; vreme odgovora servera</li>
+      <li>Velicina stranice i HTML optimizacija</li>
+      <li>Gzip/Brotli kompresija</li>
+      <li>Cache-Control headeri za staticke resurse</li>
+      <li>Broj eksternih resursa</li>
+      <li>Optimizacija slika</li>
+      <li>Lazy loading implementacija</li>
+      <li>Minifikacija CSS/JS</li>
+      <li>HTTP/2 podrska</li>
+    </ul>
+    <div class="callout"><strong>Besplatno:</strong> Skeniranje je brzo, anonimno i ne zahteva registraciju.</div>
+    <a href="./index.html" class="cta">Proverite performanse svog sajta &rarr;</a>
+  </div>
+
+  <!-- ENGLISH -->
+  <div class="en">
+    <h1>Website Performance &mdash; Complete Guide</h1>
+    <p class="subtitle">Everything about loading speed: Core Web Vitals, optimization and 6 detailed guides</p>
+    <p class="direct-answer">Your website's loading speed directly affects three things: Google rankings (Core Web Vitals have been an official ranking factor since June 2021), conversions, and visitor retention. This guide covers Core Web Vitals, image optimization, caching, compression, CDN, and lazy loading across 6 detailed tutorials.</p>
+
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-num">53%</div><div class="stat-label">Users leave after 3s</div></div>
+      <div class="stat-card"><div class="stat-num">7%</div><div class="stat-label">Less conversions per second delay</div></div>
+      <div class="stat-card"><div class="stat-num">6</div><div class="stat-label">Detailed guides</div></div>
+      <div class="stat-card"><div class="stat-num">9</div><div class="stat-label">Performance checks</div></div>
+    </div>
+
+    <h2 id="perf1e">1. Why does website speed matter?</h2>
+    <p>Your website's loading speed directly impacts three key aspects of your online presence:</p>
+    <ul>
+      <li><strong>Conversions</strong> — research shows that every second of loading delay reduces conversions by 7%. Amazon found that 100ms of additional latency would cost 1% of annual sales.</li>
+      <li><strong>SEO rankings</strong> — Google uses page speed as a direct ranking factor. Since 2021, Core Web Vitals have been an official part of the search algorithm.</li>
+      <li><strong>User experience (UX)</strong> — 53% of mobile users abandon a site that takes longer than 3 seconds to load. A fast site means satisfied visitors who return.</li>
+    </ul>
+
+    <h2 id="perf2e">2. Core Web Vitals &mdash; key metrics</h2>
+    <p>Google has defined three key metrics that measure user experience on a website:</p>
+    <ul>
+      <li><strong>LCP (Largest Contentful Paint)</strong> — measures how quickly the largest visible element loads on the page (image, video, text block). Target: under 2.5 seconds.</li>
+      <li><strong>CLS (Cumulative Layout Shift)</strong> — measures visual stability of the page, i.e., how much elements shift during loading. Target: below 0.1. Fixed dimensions for images and ads solve most issues.</li>
+      <li><strong>INP (Interaction to Next Paint)</strong> — measures page responsiveness to user interactions (clicks, taps, text input). Target: under 200 milliseconds. Replaced the older FID metric as of March 2024.</li>
+    </ul>
+    <p>You can track these metrics in Google Search Console, under the "Core Web Vitals" section.</p>
+
+    <h2 id="perf3e">3. Speed optimization techniques</h2>
+    <p>Concrete steps that can dramatically speed up your site:</p>
+    <ul>
+      <li><strong>Image compression</strong> — use modern formats like WebP or AVIF instead of PNG/JPEG. Tools like Squoosh or TinyPNG can reduce image size by 60-80% without visible quality loss.</li>
+      <li><strong>Browser caching</strong> — set Cache-Control and Expires headers so the browser stores static resources (CSS, JS, images) locally instead of downloading them on every visit.</li>
+      <li><strong>Lazy loading</strong> — load images and iframe elements only when the user scrolls to them. Simply add the <code>loading="lazy"</code> attribute to img and iframe tags.</li>
+      <li><strong>CDN (Content Delivery Network)</strong> — distribute content to servers worldwide. Visitors receive content from the nearest server, dramatically reducing latency.</li>
+      <li><strong>CSS and JS minification</strong> — remove unnecessary whitespace, comments, and unused code. Tools like Terser (JS) and cssnano (CSS) automate this process.</li>
+      <li><strong>Gzip/Brotli compression</strong> — enable server-side compression to reduce data transfer size by 70-90%.</li>
+    </ul>
+
+    <h2 id="perf4e">4. Performance measurement tools</h2>
+    <p>Use these tools to analyze and monitor your site's speed:</p>
+    <ul>
+      <li><strong>Google Lighthouse</strong> — built into Chrome DevTools (F12 > Lighthouse tab). Provides a comprehensive report on performance, accessibility, SEO, and best practices with a score from 0 to 100.</li>
+      <li><strong>PageSpeed Insights</strong> — Google's online tool that analyzes a page and provides recommendations. Shows both real user data (CrUX) and lab tests.</li>
+      <li><strong>WebPageTest</strong> — an advanced tool that allows testing from different locations, browsers, and connection speeds. Provides detailed loading waterfall diagrams.</li>
+      <li><strong>GTmetrix</strong> — combines data from various sources and displays performance history over time.</li>
+    </ul>
+
+    <h2 id="perf5e">5. Our detailed guides</h2>
+    <div class="article-cards">
+      <a href="./blog-perf-cwv.html" class="article-card">
+        <span class="card-tag">Metrics</span><h3>Core Web Vitals</h3>
+        <p>LCP, CLS, INP in detail: how to measure, optimize and track in Search Console.</p>
+      </a>
+      <a href="./blog-perf-images.html" class="article-card">
+        <span class="card-tag">Images</span><h3>Image Optimization</h3>
+        <p>WebP, AVIF, srcset, lazy loading, image CDN, Squoosh, width/height for CLS.</p>
+      </a>
+      <a href="./blog-perf-cache.html" class="article-card">
+        <span class="card-tag">Cache</span><h3>HTTP Caching</h3>
+        <p>Cache-Control, ETag, CDN cache, Service Worker, cache-busting strategies.</p>
+      </a>
+      <a href="./blog-perf-compression.html" class="article-card">
+        <span class="card-tag">Compression</span><h3>Gzip &amp; Brotli</h3>
+        <p>HTTP compression: Gzip vs Brotli, Nginx/Apache/Express config, benchmarks.</p>
+      </a>
+      <a href="./blog-perf-cdn.html" class="article-card">
+        <span class="card-tag">CDN</span><h3>Content Delivery Network</h3>
+        <p>Cloudflare, AWS CloudFront, Vercel Edge. Setup, DDoS protection, cache invalidation.</p>
+      </a>
+      <a href="./blog-perf-lazy.html" class="article-card">
+        <span class="card-tag">Loading</span><h3>Lazy Loading</h3>
+        <p>Native lazy loading, Intersection Observer, code splitting, fetchpriority.</p>
+      </a>
+    </div>
+
+    <h2 id="perf6e">6. What our scanner measures</h2>
+    <p>Our <a href="./index.html">Web Security Scanner</a> checks 9 performance aspects:</p>
+    <ul>
+      <li>TTFB, page size, Gzip/Brotli compression</li>
+      <li>Cache-Control headers, external resources count</li>
+      <li>Image optimization, lazy loading, minification</li>
+      <li>HTTP/2 support</li>
+    </ul>
+    <a href="./index.html" class="cta">Check your site's performance &rarr;</a>
+  </div>
+
+  </main>
+</div>
+<script src="./blog-common.js" defer></script>
+</body>
+</html>

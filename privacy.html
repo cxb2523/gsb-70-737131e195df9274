@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy / Politika privatnosti — Web Security Scanner · GDPR · ZZPL</title>
+  <meta name="description" content="Privacy Policy: what we store in the database, how PII data is hashed, retention period, how to exercise your GDPR rights. ZZPL compliant. · Politika privatnosti: sta cuvamo u bazi, kako se hashuju PII podaci, retention period, kako ostvarujete svoja GDPR prava. ZZPL uskladjenost.">
+  <meta name="keywords" content="politika privatnosti, privacy policy, GDPR, ZZPL, zastita podataka, licni podaci, data retention, DSAR, prava korisnika, personal data, data protection, PII, data subject rights, privacy notice, GDPR compliance, ZZPL compliance">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://security-skener.gradovi.rs/privacy.html">
+  <link rel="alternate" hreflang="sr" href="https://security-skener.gradovi.rs/privacy.html">
+  <link rel="alternate" hreflang="x-default" href="https://security-skener.gradovi.rs/privacy.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Privacy Policy / Politika privatnosti">
+  <meta property="og:description" content="What we store, how PII is hashed, retention, GDPR rights. · Sta cuvamo, kako se hashuje PII, retention, GDPR prava.">
+  <meta property="og:url" content="https://security-skener.gradovi.rs/privacy.html">
+  <meta property="og:site_name" content="Web Security Scanner">
+  <meta property="og:locale" content="sr_RS">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Privacy Policy / Politika privatnosti">
+  <meta name="twitter:description" content="GDPR + ZZPL privacy policy. · GDPR + ZZPL politika privatnosti.">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./blog-common.css">
+</head>
+<body>
+<div class="blog-layout">
+  <aside class="timeline-nav">
+    <div class="sr"><div class="timeline-title">Sadrzaj</div><ol id="timeline-sr"></ol></div>
+    <div class="en"><div class="timeline-title">Contents</div><ol id="timeline-en"></ol></div>
+  </aside>
+  <main class="blog-content">
+
+  <!-- SERBIAN -->
+  <div class="sr">
+    <h1>Politika privatnosti</h1>
+    <p class="subtitle">Verzija <strong>2026-04-13-v4</strong> &middot; Poslednje azuriranje: 13. april 2026. &middot; <em>v4: javna galerija rezultata (opt-in objava, sekcija 15).</em></p>
+
+    <h2 id="pp1">1. Ko smo mi</h2>
+    <p>Web Security Scanner je besplatan online alat za pasivnu analizu bezbednosti veb sajtova. Operater sajta je <a href="https://toske-programer.web.app" target="_blank" rel="noopener">Toske-Programer</a>. Ova politika privatnosti objasnjava detaljno sta konkretno radimo sa vasim podacima, koliko dugo ih cuvamo, i kako ostvarujete svoja prava.</p>
+
+    <h2 id="pp2">2. Sta tacno cuvamo u bazi</h2>
+    <p>Za razliku od ranijih verzija ovog servisa koje su podatke drzale samo u memoriji, aktuelna verzija cuva svaki scan u nasoj <strong>persistent bazi podataka</strong> (PostgreSQL preko Supabase-a) zbog audit traga, zastite od zloupotrebe, i omogucavanja korisniku da kasnije pregleda svoje skeniranje. Konkretni podaci koje cuvamo:</p>
+    <ul>
+      <li><strong>URL koji skenirate</strong> i <strong>normalizovani domen</strong></li>
+      <li><strong>Ceo rezultat skeniranja</strong> (JSONB polje: grade, score, counts, lista pronalazaka, kategorije)</li>
+      <li><strong>Hash IP adrese</strong> (SHA-256 sa server-side salt-om) — NE raw IP</li>
+      <li><strong>Hash User-Agent stringa</strong> (SHA-256 sa istim salt-om) — NE raw UA</li>
+      <li><strong>Opcioni session_id</strong> (browser session iz frontend-a, UUID, nikad personalno)</li>
+      <li><strong>Opcioni fingerprint_hash</strong> (canvas/WebGL fingerprint ako ga frontend proslijedi)</li>
+      <li><strong>Verzija pristanka</strong> (<code>consent_version</code>) i flag da ste eksplicitno prihvatili Uslove koriscenja</li>
+      <li><strong>Vremenski pecati</strong> (kreiranje, zavrsetak)</li>
+    </ul>
+    <p>Svaki scan dodatno generise <strong>3 do 10 zapisa</strong> u <code>audit_log</code> tabeli (jedan po dogadjaju: scan_request, scan_start, scan_complete, scan_blocked_*, scan_error). Audit_log cuva istu pseudonimizovanu identitetsku informaciju plus context u details JSONB polju.</p>
+    <p><strong>Ono sto NE cuvamo:</strong> imena, email adrese (osim u dva slucaja — vidi ispod), lozinke, sadrzaj skeniranog sajta osim metadata-e (header-i, score), raw IP adrese, raw User-Agent stringove, istoriju bilo cega povezano sa vasom identitetskom iz spoljnih izvora.</p>
+    <p><strong>Izuzeci za email:</strong> Cuvamo vasu email adresu u dva konteksta:</p>
+    <ul>
+      <li><strong>Abuse report</strong> — ako dobrovoljno ostavite email prilikom podnosenja prijave zloupotrebe, cuvamo ga da bismo vam odgovorili na ishod</li>
+      <li><strong>Pro pretplata</strong> — ako kupite Pro plan, email koji ste koristili kod Lemon Squeezy checkout-a se sinhronizuje u nasu <code>subscriptions</code> tabelu kako bismo znali kome pripada koji license_key. Ovaj email se cuva samo dok traje pretplata plus 10 godina pravnog retention-a za porez/racunovodstvo (srpska zakonska obaveza)</li>
+    </ul>
+
+    <h2 id="pp3">3. Pseudonimizacija PII (kako funkcionise hashovanje)</h2>
+    <p>Umesto da cuvamo vasu IP adresu i User-Agent u izvornom obliku, propuzamo ih kroz SHA-256 hash funkciju sa <strong>tajnim server-side salt-om</strong> koji postoji samo u nasem deployment env-u i nikad ne ide u bazu:</p>
+    <p style="margin-left:1.2rem"><code>ip_hash = SHA-256(vasa_ip + ":" + server_salt)</code></p>
+    <p>Ovo se po GDPR Art. 4(5) kvalifikuje kao <strong>pseudonimizacija</strong>. Efekti:</p>
+    <ul>
+      <li>Ako napadac ikad exfiltrira nasu bazu, <strong>dobija samo hash-eve, ne IP adrese</strong>. Bez salt-a hashovi se ne mogu brute-force-ovati (salt nam je 256-bitni random string)</li>
+      <li>Mi i dalje mozemo da koreliramo vase skeniranje ("koliko ste scan-ova uradili sa ove IP") jer isti IP uvek daje isti hash</li>
+      <li>Ne mozemo da enumeriramo sve IP adrese koje su ikad koristile servis (jer hash je jednosmeran). Ovo je <strong>namerno ograniceno</strong> da bismo zastitili vas anonimitet</li>
+      <li>Kad trazite GDPR brisanje, moracete nam dostaviti vasu IP adresu i priblizno vreme — mi onda racunamo hash i brisemo podudarajuce redove. Bez tih informacija ne mozemo pouzdano da identifikujemo "vase" redove (videti sekciju 8)</li>
+    </ul>
+
+    <h2 id="pp4">4. Kako koristimo podatke</h2>
+    <ul>
+      <li>Izvrsavanje bezbednosne analize URL-a koji ste uneli</li>
+      <li>Cuvanje rezultata skeniranja tako da ga mozete pregledati kasnije (bez verifikacije vlasnistva, vidite samo osnovne statistike; sa verifikovanim vlasnistvom — pun sadrzaj)</li>
+      <li>Rate limiting — zastita od zloupotrebe servisa (5 scan-ova po 30 minuta po IP hash-u)</li>
+      <li>Audit trail za forenzicki odgovor na eventualne zloupotrebe</li>
+      <li>Omogucavanje vlasniku skeniranog sajta da podnese abuse report i dokaze koji scan-ovi su ga ticali</li>
+      <li>Prikazivanje reklama putem Google AdSense</li>
+    </ul>
+    <p>Pravna osnova obrade (GDPR Art. 6): <strong>legitimni interes</strong> za forenzicki audit i zastitu servisa, plus <strong>saglasnost</strong> koju dajete na svakom scan-u kroz checkbox pre pokretanja analize.</p>
+
+    <h2 id="pp5">5. Retention — koliko dugo cuvamo podatke</h2>
+    <p>Svaka tabela u nasoj bazi ima sopstveni retention period, automatizovan kroz dnevne pg_cron zadatke:</p>
+    <ul>
+      <li><strong>scans</strong> (rezultati skeniranja): cuvaju se dok korisnik ne trazi brisanje ili dok vi, kao operater, ne pokrenete veci cleanup. Nema automatskog brisanja.</li>
+      <li><strong>audit_log</strong> (forenzicki trag): <strong>90 dana</strong> za redovne zapise, zatim automatsko brisanje. Flagovani redovi (povezani sa abuse report-om) se <strong>cuvaju zauvek</strong> kao pravni dokaz.</li>
+      <li><strong>verified_domains</strong> (grantovi za punu vidljivost): <strong>30 dana</strong> po kombinaciji (domen, IP hash), zatim istice.</li>
+      <li><strong>verification_tokens</strong> (pending challenge-i): <strong>1 sat</strong> za pending, zatim istice automatski.</li>
+      <li><strong>scan_requests</strong> (wizard za puni sken): cuva samo <strong>created_date</strong> kao DATE (NE timestamp) — privacy-by-design, ne moze da otkrije tacno vreme klika na consent. Wizardi koji nisu izvrseni u <strong>24 sata</strong> automatski se brisu cron-om. Zavrseni wizardi cuvaju samo state machine flag-ove (consent dat: da/ne, verifikacija prosla: da/ne) bez timestamp-a.</li>
+      <li><strong>rate_limits</strong>: rolling prozor, cisti se automatski kad prodje vremenski interval.</li>
+      <li><strong>abuse_reports</strong>: zauvek, kao pravni trag, osim ako reporter ne povuce prijavu.</li>
+      <li><strong>Backup-ovi</strong>: dnevni enkriptovani backup se cuva na Cloudflare R2 <strong>90 dana</strong> po R2 lifecycle pravilu. Metadata o backup-ima se cuva 180 dana.</li>
+    </ul>
+
+    <h2 id="pp6">6. Bezbednost podataka</h2>
+    <p>Ova sekcija opisuje konkretne mere zastite koje primenjujemo:</p>
+    <ul>
+      <li><strong>Transport</strong>: svi podaci se prenose kroz HTTPS (TLS 1.2+) koji obezbedjuje Cloudflare i HF Spaces</li>
+      <li><strong>Enkripcija u mirovanju</strong>: Supabase obezbedjuje AES-256 enkripciju na nivou diska za celu bazu</li>
+      <li><strong>Row-Level Security</strong>: svaka tabela ima RLS ukljucen sa default-deny politikom. Public anon kljuc <strong>ne vidi nista</strong> — sve citanje i pisanje ide preko service_role kljuca koji je samo na backend-u</li>
+      <li><strong>Append-only audit_log</strong>: <code>UPDATE</code> i <code>DELETE</code> su revocirani cak i za service_role. Audit istoriju je namerno nemoguce prepisati iz aplikacije — zahteva eksplicitnu migraciju baze</li>
+      <li><strong>Pseudonimizacija PII</strong>: sve licne informacije (IP, UA) su hashovane sa server-side salt-om pre upisa (videti sekciju 3)</li>
+      <li><strong>Backup enkripcija</strong>: dnevni backup-ovi su AES-256-GCM enkriptovani pre upload-a na Cloudflare R2. Kljuc za dekripciju postoji samo u nasem password manager-u i Supabase Vault-u</li>
+      <li><strong>Offsite storage</strong>: backup-ovi su na R2 (Cloudflare), odvojenom provajderu od primarne baze — data loss zbog Supabase incident-a ne brise backup-e</li>
+      <li><strong>Tested recovery</strong>: kvartalno testiramo restore backup-a na izolovani staging projekat da bismo dokazali da backup-ovi rade (a ne samo da se prave)</li>
+    </ul>
+
+    <h2 id="pp7">7. Kolacici, oglasavanje, i trece strane</h2>
+    <p>Koristimo <strong>granularni cookie consent</strong> (GDPR/ePrivacy compliant) sa tri kategorije:</p>
+    <ul>
+      <li><strong>Neophodni</strong> (uvek aktivni, ne mogu se iskljuciti): <code>cookie_consent_v2</code> (localStorage — vasa saglasnost), <code>wss-lang</code> (izbor jezika), scan session ID</li>
+      <li><strong>Analiticki</strong> (opcioni): Google Analytics (<code>_ga</code>, <code>_gid</code>) — trajanje do 2 godine. Ovi kolacici se NE postavljaju dok eksplicitno ne odobrite</li>
+      <li><strong>Reklamni</strong> (opcioni): Google AdSense (<code>_gcl_*</code>, <code>IDE</code>, <code>NID</code>, <code>DSID</code>, <code>FLC</code>, <code>AID</code>, <code>TAID</code>) — trece lice: Google LLC, trajanje do 2 godine. Ovi kolacici se NE postavljaju dok eksplicitno ne odobrite</li>
+    </ul>
+    <p><strong>AdSense skripta se ne ucitava</strong> dok ne kliknete "Prihvati sve" ili "Sacuvaj izbor" sa cekiranimreklamnim kolacicima. Ako odbijete, nikakvi tracking kolacici se ne postavljaju i nikakvi podaci se ne salju Google-u.</p>
+    <p>Mozete u svakom trenutku promeniti svoju odluku klikom na <strong>"Podesavanja kolacica"</strong> u footer-u bilo koje stranice. Vise informacija na <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener">Google Ads politika</a>.</p>
+    <p>Koristimo sledece servise trecih strana:</p>
+    <ul>
+      <li><strong>Supabase</strong> (EU region) — primarna PostgreSQL baza + Edge Functions + Vault</li>
+      <li><strong>Cloudflare R2</strong> — offsite backup storage (enkriptovano)</li>
+      <li><strong>Hugging Face Spaces</strong> — backend API hosting</li>
+      <li><strong>Vercel</strong> — frontend hosting</li>
+      <li><strong>Google AdSense</strong> — prikazivanje oglasa</li>
+      <li><strong>Google Fonts</strong> — ucitavanje fontova</li>
+      <li><strong>Lemon Squeezy</strong> (USA, Merchant of Record) — obrada placanja za Pro pretplate. Ako kupite Pro plan, vasa kartica i personalna placanja se salju <strong>direktno Lemon Squeezy-ju</strong>, ne nama. Mi od njih primamo samo: email adresu, iznos, status pretplate, i license_key. Lemon Squeezy je registrovan u Delaware (SAD) i radi kao formalni prodavac za nas — oni izdaju racune, obracunavaju VAT u 100+ zemalja, i hendluju chargeback-ove. Njihova politika privatnosti: <a href="https://www.lemonsqueezy.com/privacy" target="_blank" rel="noopener">lemonsqueezy.com/privacy</a></li>
+    </ul>
+    <p><strong>Napomena o prenosu podataka u SAD:</strong> Lemon Squeezy je jedini provajder u nasem stack-u koji je van EU. Oni deklarise usaglasenost sa GDPR-om i imaju Standard Contractual Clauses (SCCs) kao osnovu za prenos podataka iz EU u SAD. Ako ne zelite da vasi podaci prolaze kroz SAD, ne kupujte Pro plan — besplatni tier ostaje potpuno EU-only.</p>
+    <p>Svi ostali provajderi su odabrani tako da primarno cuvaju podatke u EU/EEA regionu. Ako imate specificna pitanja o prenosu podataka, kontaktirajte nas.</p>
+
+    <h2 id="pp8">8. Vasa prava pod GDPR-om</h2>
+    <p>Ako se nalazite u Evropskom ekonomskom prostoru, imate sledeca prava:</p>
+    <ul>
+      <li><strong>Art. 15 — pravo pristupa</strong>: da zatrazite kopiju podataka koje imamo o vama</li>
+      <li><strong>Art. 16 — pravo na ispravku</strong>: netacnih podataka</li>
+      <li><strong>Art. 17 — pravo na brisanje</strong>: &quot;pravo da se bude zaboravljen&quot;</li>
+      <li><strong>Art. 18 — pravo na ogranicavanje obrade</strong></li>
+      <li><strong>Art. 20 — pravo na prenosivost podataka</strong></li>
+      <li><strong>Art. 21 — pravo na prigovor</strong> protiv obrade na osnovu legitimnog interesa</li>
+      <li><strong>Pravo da podnesete zalbu</strong> nadleznom organu za zastitu podataka u vasoj zemlji</li>
+    </ul>
+    <p><strong>Kako da ostvarite svoja prava:</strong> posto cuvamo samo pseudonimizovane (hash-ovane) identifikatore, bez vase pomoci ne mozemo da identifikujemo &quot;vase&quot; redove u bazi. Da biste poslali zahtev, kontaktirajte nas i navedite:</p>
+    <ul>
+      <li>IP adresu koju ste koristili u trenutku skeniranja</li>
+      <li>Priblizno vreme (dan i sat)</li>
+      <li>Eventualno domen koji ste skenirali ako znate</li>
+    </ul>
+    <p>Uz te informacije mozemo da izracunamo vas hash i pronadjemo podudarajuce redove u <code>scans</code> i <code>audit_log</code> tabelama. Brisanje se vrsi u roku od 30 dana od prijema zahteva (GDPR Art. 12). <strong>Napomena o audit_log-u:</strong> audit log je namerno append-only i cuva se 90 dana kao forenzicki trag pod pravnom osnovom legitimnog interesa (GDPR Art. 6(1)(f) — dokumentovanje potencijalnih sigurnosnih incidenata). Vasi zapisi se nece fizicki obrisati iz audit_log-a, ali ce se markirati kao &quot;izuzeti od operativne statistike&quot; i ionako ce biti automatski obrisani nakon 90 dana ako nisu flagovani.</p>
+
+    <h2 id="pp9">9. Prava vlasnika skeniranog sajta (abuse report)</h2>
+    <p>Ako ste vlasnik domena koji je neko skenirao preko naseg servisa bez vase dozvole, mozete podneti prijavu preko link-a &quot;Prijavi zloupotrebu&quot; u footer-u ili direktno na <a href="/abuse-report#form">stranici za prijavu zloupotrebe</a>. Pregledamo svaku prijavu u roku od 72 sata. Ako potvrdimo zloupotrebu:</p>
+    <ul>
+      <li>Dodajemo vas domen na listu blokade — svi buduci scan-ovi tog domena vracaju HTTP 403</li>
+      <li>Povezani <code>audit_log</code> redovi se flaguju kao pravni dokaz i cuvaju zauvek (umesto 90 dana)</li>
+      <li>Ako ste ostavili email, obavestavamo vas o ishodu</li>
+    </ul>
+    <p>Za vise detalja o tome kako funkcionisu uslovi koriscenja i ownership verifikacija, pogledajte <a href="./terms.html">Uslove koriscenja</a>.</p>
+
+    <h2 id="pp10">10. Izmene politike, deca, i kontakt</h2>
+    <p><strong>Trenutna verzija politike: <code>2026-04-13-v4</code></strong> — ovo je ista verzija koja se belezi u sistemu kada pokrenete skeniranje. Zadrzavamo pravo da azuriramo ovu politiku. Verzija se menja sa svakim azuriranjem i svaki novi scan ce traziti od vas da potvrdite aktuelnu verziju. Vase prethodne saglasnosti ostaju vazece u audit_log-u ali se ne primenjuju retroaktivno na nove odredbe.</p>
+    <p><strong>Deca:</strong> Ovaj servis nije namenjen osobama mladjim od 16 godina. Ne prikupljamo svesno podatke od maloletnika. Ako saznamo da je maloletnik nevoljno dostavio podatke, brisemo ih.</p>
+    <p><strong>Kontakt rukovaoca (cl. 23 ZZPL):</strong></p>
+    <ul>
+      <li>Opsta pitanja: <a href="mailto:kontakt@gradovi.rs">kontakt@gradovi.rs</a></li>
+      <li>Sigurnosni propusti: <a href="mailto:security@gradovi.rs">security@gradovi.rs</a></li>
+      <li>Abuse prijave: <a href="mailto:abuse@gradovi.rs">abuse@gradovi.rs</a> ili <a href="./abuse-report.html">online forma</a></li>
+      <li>Pro plan i refundacije: <a href="mailto:pro@gradovi.rs">pro@gradovi.rs</a></li>
+      <li>Rok za odgovor: 30 dana od prijema zahteva (cl. 21 ZZPL / GDPR Art. 12)</li>
+    </ul>
+
+    <h2 id="pp11">11. Automatizovano odlucivanje (cl. 38 ZZPL)</h2>
+    <p>Ovaj servis <strong>NE koristi automatizovano odlucivanje</strong> koje proizvodi pravne posledice po korisnika ili znacajno utice na njegov polozaj. Skeniranje je tehnicka analiza koja ne donosi odluke o korisnicima. Risk score (A-F ocena) je informativni alat, ne automatizovana odluka.</p>
+
+    <h2 id="pp12">12. Pravni osnov obrade — legitimni interes (cl. 12 st. 1 tac. 6 ZZPL)</h2>
+    <p>Pravni osnov za obradu podataka u audit_log tabeli je <strong>legitimni interes</strong> rukovaoca za:</p>
+    <ul>
+      <li>Forenzicki audit — zastita servisa od zloupotrebe</li>
+      <li>Pravna odbrana — dokaz da je korisnik dao saglasnost pre skeniranja</li>
+      <li>Bezbednost — detekcija zlonamernih obrazaca (mass-scanning, SSRF pokusaji)</li>
+    </ul>
+    <p>Procena: interes rukovaoca (zastita besplatnog servisa od zloupotrebe) preteze nad pravima lica jer se obradjuju samo <strong>pseudonimizovani podaci</strong> (SHA-256 hash IP-a i User-Agent-a), nikad sirovi podaci. Korisnik ima pravo da podnese <strong>prigovor</strong> na ovu obradu (cl. 37 ZZPL) putem email-a gore.</p>
+
+    <h2 id="pp13">13. Povreda podataka o licnosti (cl. 52 ZZPL)</h2>
+    <p>U slucaju povrede zastite podataka o licnosti (data breach), rukovalac ce:</p>
+    <ul>
+      <li>Obavestiti Poverenika u roku od <strong>72 sata</strong> od saznanja o povredi</li>
+      <li>Obavestiti lica na koja se podaci odnose <strong>bez nepotrebnog odlaganja</strong> ako povreda moze da prouzrokuje visok rizik za njihova prava</li>
+      <li>Dokumentovati svaku povredu u internom registru (PRIRUCNIK.md §17)</li>
+    </ul>
+    <p>Kontakt Poverenika: <a href="https://www.poverenik.rs" target="_blank" rel="noopener">poverenik.rs</a></p>
+
+    <h2 id="pp14">14. Istorija verzija politike privatnosti</h2>
+    <div style="display:flex;flex-direction:column;gap:0.8rem;">
+      <div style="padding:0.9rem 1rem;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:10px;">
+        <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.4rem;">
+          <code style="font-size:0.85rem;font-weight:700;">2026-04-13-v4</code>
+          <span style="font-size:0.68rem;background:#22c55e;color:#0a0c15;padding:0.1rem 0.45rem;border-radius:4px;font-weight:700;">AKTIVNA</span>
+          <span style="font-size:0.75rem;color:#7b83a6;">13. april 2026.</span>
+        </div>
+        <p style="font-size:0.78rem;color:#c0c4db;line-height:1.5;margin:0;">Dodata sekcija 15 — javna galerija rezultata (opt-in objava). Publikacija je iskljucivo po zelji korisnika, pravni osnov cl. 12 st. 1 tac. 1 ZZPL (saglasnost), pravo povlacenja sa istog uredaja, retencija 90 dana posle povlacenja. Nikada se ne objavljuju konkretne ranjivosti, tehnoloski otisci, IP ili UA podaci.</p>
+      </div>
+      <div style="padding:0.9rem 1rem;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;">
+        <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.4rem;">
+          <code style="font-size:0.85rem;">2026-04-12-v3</code>
+          <span style="font-size:0.68rem;color:#7b83a6;">zamenjeno v4</span>
+          <span style="font-size:0.75rem;color:#7b83a6;">12. april 2026.</span>
+        </div>
+        <p style="font-size:0.78rem;color:#7b83a6;line-height:1.5;margin:0;">ZZPL uskladjenost: kontakt email rukovaoca (cl. 23), automatizovano odlucivanje (cl. 38), legitimni interes dokumentovan (cl. 12), procedura za povredu podataka (cl. 52), cookie consent V2 sa 3 kategorije, kontakt Poverenika sa adresama.</p>
+      </div>
+      <div style="padding:0.9rem 1rem;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;">
+        <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.4rem;">
+          <code style="font-size:0.85rem;">2026-04-10-v2</code>
+          <span style="font-size:0.68rem;color:#7b83a6;">zamenjeno v3</span>
+          <span style="font-size:0.75rem;color:#7b83a6;">10. april 2026.</span>
+        </div>
+        <p style="font-size:0.78rem;color:#7b83a6;line-height:1.5;margin:0;">Dodat Lemon Squeezy kao sub-processor (Merchant of Record za Pro pretplate, Delaware SAD). Email se cuva i za Pro korisnike pored abuse report-a. Dodata scan_requests tabela (gate-before-scan wizard).</p>
+      </div>
+      <div style="padding:0.9rem 1rem;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;">
+        <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.4rem;">
+          <code style="font-size:0.85rem;">2026-04-10-v1</code>
+          <span style="font-size:0.68rem;color:#7b83a6;">zamenjeno v2</span>
+          <span style="font-size:0.75rem;color:#7b83a6;">10. april 2026.</span>
+        </div>
+        <p style="font-size:0.78rem;color:#7b83a6;line-height:1.5;margin:0;">Prva verzija politike privatnosti. PII hashovanje (SHA-256), audit_log (append-only, 90 dana), verified_domains (30 dana), rate_limits, abuse_reports, backup (AES-256-GCM, R2). Supabase kao jedini sub-processor.</p>
+      </div>
+    </div>
+    <p style="font-size:0.75rem;color:#7b83a6;margin-top:0.7rem;">Svaka verzija je trajno sacuvana u <code>audit_log</code> tabeli — consent koji ste dali vazi za verziju koja je bila aktivna u tom trenutku.</p>
+
+    <h2 id="pp15">15. Javna galerija rezultata (opt-in objava)</h2>
+    <p>Od aprila 2026. korisnik koji je pokrenuo skeniranje moze, <strong>iskljucivo svojim izborom</strong>, objaviti rezime rezultata u javnoj galeriji na <a href="/gallery">/gallery</a>. Objava je podrazumevano iskljucena — dok ne kliknete "Objavi u galeriji" i ne potvrdite consent modal, nijedan rezultat nije javan.</p>
+    <p><strong>Sta se objavljuje u galeriji:</strong></p>
+    <ul>
+      <li>URL skeniranog sajta</li>
+      <li>Ukupna ocena (A-F) i skor (0-100)</li>
+      <li>Profil strogosti (Basic / Standard / Strict / Paranoid)</li>
+      <li>Broj nalaza po ozbiljnosti (Critical / High / Medium / Low)</li>
+      <li>Ocena i procenat prolaznosti po kategoriji (Bezbednost / SEO / Performanse / GDPR / Pristupacnost)</li>
+      <li>Datum objave</li>
+    </ul>
+    <p><strong>Sta se NIKADA ne objavljuje:</strong></p>
+    <ul>
+      <li>Konkretne ranjivosti ili ID-evi provera</li>
+      <li>Izlozeni fajlovi, putanje ili kredencijali</li>
+      <li>Tehnoloski otisci (CMS, verzije, serverske zaglavlja)</li>
+      <li>Vasa IP adresa, User-Agent, ili browser podaci</li>
+    </ul>
+    <p><strong>Pravo na povlacenje:</strong> objava se moze povuci u bilo kom trenutku sa istog uredjaja sa kojeg je i objavljena. Povlacenje je soft-delete — red u bazi ostaje zbog audit tragova, ali se vise ne prikazuje javno. Za povlacenje sa drugog uredjaja (npr. izgubljen pristup) kontaktirajte <a href="mailto:kontakt@gradovi.rs">kontakt@gradovi.rs</a>.</p>
+    <p><strong>Retention:</strong> javne objave nemaju automatski rok isteka — ostaju dok ih vlasnik ne povuce. Povucene objave (<code>withdrawn_at IS NOT NULL</code>) se posle 90 dana trajno brisu iz baze.</p>
+    <p><strong>Pravni osnov:</strong> eksplicitan consent (cl. 12 st. 1 tac. 1 ZZPL) — modal sa jasnom listom "sta se objavljuje / sta NE" pre svake objave. Consent se loguje u <code>audit_log</code> kao <code>gallery_publish</code> event.</p>
+  </div>
+
+  <!-- ENGLISH -->
+  <div class="en">
+    <h1>Privacy Policy</h1>
+    <p class="subtitle">Version <strong>2026-04-13-v4</strong> &middot; Last updated: April 13, 2026 &middot; <em>v4: public scan gallery (opt-in publishing, section 15).</em></p>
+
+    <h2 id="pp1e">1. Who we are</h2>
+    <p>Web Security Scanner is a free online tool for passive security analysis of websites. The site operator is <a href="https://toske-programer.web.app" target="_blank" rel="noopener">Toske-Programer</a>. This privacy policy explains in detail what we do with your data, how long we keep it, and how to exercise your rights.</p>
+
+    <h2 id="pp2e">2. What we actually store in our database</h2>
+    <p>Unlike earlier versions of this service that kept data only in memory, the current version stores every scan in our <strong>persistent database</strong> (PostgreSQL via Supabase) for audit trail, abuse protection, and letting users review their own scans later. The specific data we store:</p>
+    <ul>
+      <li><strong>The URL you scan</strong> and the <strong>normalized domain</strong></li>
+      <li><strong>The full scan result</strong> (JSONB field: grade, score, counts, list of findings, categories)</li>
+      <li><strong>Hash of your IP address</strong> (SHA-256 with a server-side salt) — NOT the raw IP</li>
+      <li><strong>Hash of your User-Agent</strong> (SHA-256 with the same salt) — NOT the raw UA</li>
+      <li><strong>Optional session_id</strong> (browser session from frontend, UUID, never personal)</li>
+      <li><strong>Optional fingerprint_hash</strong> (canvas/WebGL fingerprint if the frontend passes it)</li>
+      <li><strong>Consent version</strong> (<code>consent_version</code>) and a flag that you explicitly accepted the Terms of Service</li>
+      <li><strong>Timestamps</strong> (creation, completion)</li>
+    </ul>
+    <p>Each scan additionally generates <strong>3 to 10 entries</strong> in the <code>audit_log</code> table (one per event: scan_request, scan_start, scan_complete, scan_blocked_*, scan_error). The audit_log stores the same pseudonymized identity information plus context in a details JSONB field.</p>
+    <p><strong>What we do NOT store:</strong> names, email addresses (except in two cases — see below), passwords, contents of the scanned site beyond metadata (headers, score), raw IP addresses, raw User-Agent strings, or any history tied to your identity from external sources.</p>
+    <p><strong>Email exceptions:</strong> We store your email address in two contexts:</p>
+    <ul>
+      <li><strong>Abuse reports</strong> — if you voluntarily leave an email when filing an abuse report, we store it so we can reply with the outcome</li>
+      <li><strong>Pro subscriptions</strong> — if you buy a Pro plan, the email you used at Lemon Squeezy checkout is synced into our <code>subscriptions</code> table so we know which license_key belongs to whom. This email is kept for the duration of the subscription plus a 10-year legal retention period for tax/accounting purposes (Serbian statutory requirement)</li>
+    </ul>
+
+    <h2 id="pp3e">3. PII pseudonymization (how the hashing works)</h2>
+    <p>Instead of storing your IP address and User-Agent in their original form, we pass them through a SHA-256 hash function with a <strong>secret server-side salt</strong> that lives only in our deployment environment and is never written to the database:</p>
+    <p style="margin-left:1.2rem"><code>ip_hash = SHA-256(your_ip + ":" + server_salt)</code></p>
+    <p>Under GDPR Art. 4(5) this qualifies as <strong>pseudonymization</strong>. The effects:</p>
+    <ul>
+      <li>If an attacker ever exfiltrates our database, <strong>they get hashes, not IP addresses</strong>. Without the salt, the hashes cannot be brute-forced (the salt is a 256-bit random string)</li>
+      <li>We can still correlate your scans ("how many scans from this IP") because the same IP always produces the same hash</li>
+      <li>We cannot enumerate all IP addresses that have ever used the service (hashing is one-way). This is a <strong>deliberate limitation</strong> to protect your anonymity</li>
+      <li>When you request GDPR erasure, you will need to provide us with your IP and an approximate time — we then compute the hash and delete the matching rows. Without that information we cannot reliably identify "your" rows (see section 8)</li>
+    </ul>
+
+    <h2 id="pp4e">4. How we use data</h2>
+    <ul>
+      <li>Performing security analysis of the URL you entered</li>
+      <li>Storing scan results so you can review them later (without ownership verification you only see basic statistics; with verified ownership you see the full content)</li>
+      <li>Rate limiting — protecting the service from abuse (5 scans per 30 minutes per IP hash)</li>
+      <li>Audit trail for forensic response to potential abuse</li>
+      <li>Letting the owner of a scanned site file an abuse report and prove which scans affected them</li>
+      <li>Displaying ads via Google AdSense</li>
+    </ul>
+    <p>Legal basis for processing (GDPR Art. 6): <strong>legitimate interest</strong> in forensic audit and service protection, plus the <strong>consent</strong> you give on every scan through the checkbox before starting the analysis.</p>
+
+    <h2 id="pp5e">5. Retention — how long we keep what</h2>
+    <p>Each table in our database has its own retention period, automated via daily pg_cron jobs:</p>
+    <ul>
+      <li><strong>scans</strong> (scan results): retained until the user requests deletion or until a bulk cleanup is initiated by the operator. No automatic deletion.</li>
+      <li><strong>audit_log</strong> (forensic trail): <strong>90 days</strong> for regular entries, then automatic deletion. Flagged entries (linked to an abuse report) are <strong>kept indefinitely</strong> as legal evidence.</li>
+      <li><strong>verified_domains</strong> (full-visibility grants): <strong>30 days</strong> per (domain, IP hash) combination, then expires.</li>
+      <li><strong>verification_tokens</strong> (pending challenges): <strong>1 hour</strong> for pending, then expires automatically.</li>
+      <li><strong>scan_requests</strong> (full-scan wizard): stores only <strong>created_date</strong> as DATE (NOT timestamp) — privacy-by-design, cannot reveal the exact time you clicked consent. Wizards not executed within <strong>24 hours</strong> are auto-deleted by cron. Completed wizards keep only state-machine flags (consent given: yes/no, verify passed: yes/no) without any timestamp.</li>
+      <li><strong>rate_limits</strong>: rolling window, auto-pruned when the interval passes.</li>
+      <li><strong>abuse_reports</strong>: indefinitely, as legal evidence, unless the reporter withdraws the report.</li>
+      <li><strong>Backups</strong>: daily encrypted backups are stored on Cloudflare R2 for <strong>90 days</strong> per the R2 lifecycle rule. Backup metadata is kept 180 days.</li>
+    </ul>
+
+    <h2 id="pp6e">6. Data security</h2>
+    <p>This section describes the concrete protections we apply:</p>
+    <ul>
+      <li><strong>Transport</strong>: all data travels over HTTPS (TLS 1.2+) provided by Cloudflare and HF Spaces</li>
+      <li><strong>Encryption at rest</strong>: Supabase provides AES-256 disk-level encryption for the entire database</li>
+      <li><strong>Row-Level Security</strong>: every table has RLS enabled with a default-deny policy. The public anon key <strong>sees nothing</strong> — all reads and writes go through the service_role key which is backend-only</li>
+      <li><strong>Append-only audit_log</strong>: <code>UPDATE</code> and <code>DELETE</code> are revoked even for service_role. The audit history is intentionally impossible to rewrite from the application — it requires an explicit database migration</li>
+      <li><strong>PII pseudonymization</strong>: all personal information (IP, UA) is hashed with a server-side salt before being written (see section 3)</li>
+      <li><strong>Backup encryption</strong>: daily backups are AES-256-GCM encrypted before upload to Cloudflare R2. The decryption key exists only in our password manager and Supabase Vault</li>
+      <li><strong>Offsite storage</strong>: backups are on R2 (Cloudflare), a separate provider from the primary database — data loss due to a Supabase incident does not wipe out the backups</li>
+      <li><strong>Tested recovery</strong>: we test restore from backup on an isolated staging project quarterly to prove the backups actually work (not just that they are being created)</li>
+    </ul>
+
+    <h2 id="pp7e">7. Cookies, advertising, and third parties</h2>
+    <p>We use a <strong>granular cookie consent</strong> system (GDPR/ePrivacy compliant) with three categories:</p>
+    <ul>
+      <li><strong>Essential</strong> (always active, cannot be disabled): <code>cookie_consent_v2</code> (localStorage — your consent choice), <code>wss-lang</code> (language preference), scan session ID</li>
+      <li><strong>Analytics</strong> (optional): Google Analytics (<code>_ga</code>, <code>_gid</code>) — duration up to 2 years. These cookies are NOT set until you explicitly approve them</li>
+      <li><strong>Advertising</strong> (optional): Google AdSense (<code>_gcl_*</code>, <code>IDE</code>, <code>NID</code>, <code>DSID</code>, <code>FLC</code>, <code>AID</code>, <code>TAID</code>) — third party: Google LLC, duration up to 2 years. These cookies are NOT set until you explicitly approve them</li>
+    </ul>
+    <p><strong>The AdSense script does not load</strong> until you click "Accept All" or "Save Choices" with the advertising category checked. If you reject, no tracking cookies are set and no data is sent to Google.</p>
+    <p>You can change your decision at any time by clicking <strong>"Cookie Settings"</strong> in the footer of any page. More information at <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener">Google Ads Policy</a>.</p>
+    <p>We use the following third-party services:</p>
+    <ul>
+      <li><strong>Supabase</strong> (EU region) — primary PostgreSQL database + Edge Functions + Vault</li>
+      <li><strong>Cloudflare R2</strong> — offsite backup storage (encrypted)</li>
+      <li><strong>Hugging Face Spaces</strong> — backend API hosting</li>
+      <li><strong>Vercel</strong> — frontend hosting</li>
+      <li><strong>Google AdSense</strong> — ad display</li>
+      <li><strong>Google Fonts</strong> — font loading</li>
+      <li><strong>Lemon Squeezy</strong> (USA, Merchant of Record) — payment processing for Pro subscriptions. If you buy a Pro plan, your card and personal payment information goes <strong>directly to Lemon Squeezy</strong>, not to us. From them we receive only: email address, amount, subscription status, and license_key. Lemon Squeezy is incorporated in Delaware (USA) and acts as the legal seller on our behalf — they issue invoices, calculate VAT in 100+ countries, and handle chargebacks. Their privacy policy: <a href="https://www.lemonsqueezy.com/privacy" target="_blank" rel="noopener">lemonsqueezy.com/privacy</a></li>
+    </ul>
+    <p><strong>Note on data transfer to the USA:</strong> Lemon Squeezy is the only provider in our stack outside the EU. They declare GDPR compliance and rely on Standard Contractual Clauses (SCCs) as the legal basis for EU-to-US data transfers. If you prefer that your data not pass through the USA, do not purchase a Pro plan — the free tier remains entirely EU-only.</p>
+    <p>All other providers are chosen to primarily store data in the EU/EEA region. If you have specific questions about data transfers, contact us.</p>
+
+    <h2 id="pp8e">8. Your rights under GDPR</h2>
+    <p>If you are located in the European Economic Area, you have the following rights:</p>
+    <ul>
+      <li><strong>Art. 15 — right of access</strong>: to request a copy of the data we hold about you</li>
+      <li><strong>Art. 16 — right to rectification</strong> of inaccurate data</li>
+      <li><strong>Art. 17 — right to erasure</strong>: the &quot;right to be forgotten&quot;</li>
+      <li><strong>Art. 18 — right to restriction of processing</strong></li>
+      <li><strong>Art. 20 — right to data portability</strong></li>
+      <li><strong>Art. 21 — right to object</strong> to processing based on legitimate interest</li>
+      <li><strong>Right to file a complaint</strong> with the data protection authority in your country</li>
+    </ul>
+    <p><strong>How to exercise your rights:</strong> because we store only pseudonymized (hashed) identifiers, we cannot identify &quot;your&quot; rows in the database without your help. To submit a request, contact us and provide:</p>
+    <ul>
+      <li>The IP address you used at the time of scanning</li>
+      <li>An approximate time (day and hour)</li>
+      <li>Optionally, the domain you scanned, if you remember</li>
+    </ul>
+    <p>With that information we can compute your hash and find matching rows in the <code>scans</code> and <code>audit_log</code> tables. Deletion is performed within 30 days of receiving the request (GDPR Art. 12). <strong>Note about audit_log:</strong> the audit log is intentionally append-only and retained for 90 days as a forensic trail under the legal basis of legitimate interest (GDPR Art. 6(1)(f) — documenting potential security incidents). Your entries will not be physically deleted from audit_log but will be marked as &quot;excluded from operational statistics&quot; and will in any case be automatically pruned after 90 days unless flagged.</p>
+
+    <h2 id="pp9e">9. Rights of scanned site owners (abuse report)</h2>
+    <p>If you are the owner of a domain that someone has scanned through our service without your permission, you can file a report via the &quot;Report abuse&quot; link in the footer or directly at the <a href="/abuse-report#form-en">abuse report page</a>. We review every report within 72 hours. If we confirm abuse:</p>
+    <ul>
+      <li>We add your domain to the block list — all future scans of that domain will be refused with HTTP 403</li>
+      <li>Related <code>audit_log</code> entries are flagged as legal evidence and retained indefinitely (instead of 90 days)</li>
+      <li>If you left an email, we notify you of the outcome</li>
+    </ul>
+    <p>For more details on how the terms of service and ownership verification work, see the <a href="./terms.html">Terms of Service</a>.</p>
+
+    <h2 id="pp10e">10. Policy changes, children, and contact</h2>
+    <p><strong>Current policy version: <code>2026-04-13-v4</code></strong> — this is the same version recorded in the system when you run a scan. We reserve the right to update this policy. The version changes with each update and every new scan will ask you to confirm the current version. Your prior consents remain valid in the audit_log but do not retroactively apply to new terms.</p>
+    <p><strong>Children:</strong> this service is not intended for persons under 16 years of age. We do not knowingly collect data from minors. If we learn that a minor has involuntarily submitted data, we delete it.</p>
+    <p><strong>Controller contact (Art. 23 ZZPL):</strong></p>
+    <ul>
+      <li>General inquiries: <a href="mailto:kontakt@gradovi.rs">kontakt@gradovi.rs</a></li>
+      <li>Security vulnerabilities: <a href="mailto:security@gradovi.rs">security@gradovi.rs</a></li>
+      <li>Abuse reports: <a href="mailto:abuse@gradovi.rs">abuse@gradovi.rs</a> or <a href="./abuse-report.html">online form</a></li>
+      <li>Pro plan and refunds: <a href="mailto:pro@gradovi.rs">pro@gradovi.rs</a></li>
+      <li>Response time: within 30 days of receiving the request (Art. 21 ZZPL / GDPR Art. 12)</li>
+    </ul>
+
+    <h2 id="pp11e">11. Automated decision-making (Art. 38 ZZPL)</h2>
+    <p>This service <strong>does NOT use automated decision-making</strong> that produces legal effects or significantly affects the user. Scanning is a technical analysis that does not make decisions about users. The risk score (A-F grade) is an informational tool, not an automated decision.</p>
+
+    <h2 id="pp12e">12. Legal basis — legitimate interest (Art. 12(1)(6) ZZPL)</h2>
+    <p>The legal basis for processing data in the audit_log table is the controller's <strong>legitimate interest</strong> in:</p>
+    <ul>
+      <li>Forensic audit — protecting the service from abuse</li>
+      <li>Legal defense — proving that the user gave consent before scanning</li>
+      <li>Security — detecting malicious patterns (mass-scanning, SSRF attempts)</li>
+    </ul>
+    <p>Assessment: the controller's interest (protecting a free service from abuse) outweighs the rights of data subjects because only <strong>pseudonymized data</strong> is processed (SHA-256 hash of IP and User-Agent), never raw data. Users have the right to <strong>object</strong> to this processing (Art. 37 ZZPL) via the email above.</p>
+
+    <h2 id="pp13e">13. Personal data breach (Art. 52 ZZPL)</h2>
+    <p>In the event of a personal data breach, the controller will:</p>
+    <ul>
+      <li>Notify the Commissioner within <strong>72 hours</strong> of becoming aware of the breach</li>
+      <li>Notify affected data subjects <strong>without undue delay</strong> if the breach is likely to result in a high risk to their rights</li>
+      <li>Document every breach in an internal register</li>
+    </ul>
+    <p>Commissioner contact: <a href="https://www.poverenik.rs" target="_blank" rel="noopener">poverenik.rs</a></p>
+
+    <h2 id="pp14e">14. Privacy policy version history</h2>
+    <div style="display:flex;flex-direction:column;gap:0.8rem;">
+      <div style="padding:0.9rem 1rem;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:10px;">
+        <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.4rem;">
+          <code style="font-size:0.85rem;font-weight:700;">2026-04-13-v4</code>
+          <span style="font-size:0.68rem;background:#22c55e;color:#0a0c15;padding:0.1rem 0.45rem;border-radius:4px;font-weight:700;">ACTIVE</span>
+          <span style="font-size:0.75rem;color:#7b83a6;">April 13, 2026</span>
+        </div>
+        <p style="font-size:0.78rem;color:#c0c4db;line-height:1.5;margin:0;">Added section 15 — public scan gallery (opt-in publishing). Publishing is strictly at the user's choice, legal basis Art. 12(1)(1) ZZPL (consent), right to withdraw from the same device, 90-day retention after withdrawal. Vulnerability specifics, tech fingerprints, IP and UA data are never published.</p>
+      </div>
+      <div style="padding:0.9rem 1rem;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;">
+        <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.4rem;">
+          <code style="font-size:0.85rem;">2026-04-12-v3</code>
+          <span style="font-size:0.68rem;color:#7b83a6;">replaced by v4</span>
+          <span style="font-size:0.75rem;color:#7b83a6;">April 12, 2026</span>
+        </div>
+        <p style="font-size:0.78rem;color:#7b83a6;line-height:1.5;margin:0;">ZZPL compliance: controller email (Art. 23), automated decision-making (Art. 38), legitimate interest documented (Art. 12), data breach procedure (Art. 52), cookie consent V2 with 3 categories, Commissioner contact with addresses.</p>
+      </div>
+      <div style="padding:0.9rem 1rem;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;">
+        <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.4rem;">
+          <code style="font-size:0.85rem;">2026-04-10-v2</code>
+          <span style="font-size:0.68rem;color:#7b83a6;">replaced by v3</span>
+          <span style="font-size:0.75rem;color:#7b83a6;">April 10, 2026</span>
+        </div>
+        <p style="font-size:0.78rem;color:#7b83a6;line-height:1.5;margin:0;">Added Lemon Squeezy as sub-processor (Merchant of Record for Pro subscriptions, Delaware USA). Email now stored for Pro subscribers in addition to abuse reports. Added scan_requests table (gate-before-scan wizard).</p>
+      </div>
+      <div style="padding:0.9rem 1rem;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;">
+        <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.4rem;">
+          <code style="font-size:0.85rem;">2026-04-10-v1</code>
+          <span style="font-size:0.68rem;color:#7b83a6;">replaced by v2</span>
+          <span style="font-size:0.75rem;color:#7b83a6;">April 10, 2026</span>
+        </div>
+        <p style="font-size:0.78rem;color:#7b83a6;line-height:1.5;margin:0;">First version of privacy policy. PII hashing (SHA-256), audit_log (append-only, 90 days), verified_domains (30 days), rate_limits, abuse_reports, backup (AES-256-GCM, R2). Supabase as sole sub-processor.</p>
+      </div>
+    </div>
+    <p style="font-size:0.75rem;color:#7b83a6;margin-top:0.7rem;">Each version is permanently recorded in the <code>audit_log</code> table — the consent you gave applies to the version that was active at that moment.</p>
+
+    <h2 id="pp15e">15. Public scan gallery (opt-in publishing)</h2>
+    <p>Starting April 2026, the person who ran a scan can <strong>opt in</strong> to publish the result summary on the public gallery at <a href="/gallery">/gallery</a>. Publication is off by default — unless you click "Publish to gallery" and confirm the consent modal, no result is public.</p>
+    <p><strong>What appears in the gallery:</strong></p>
+    <ul>
+      <li>URL of the scanned site</li>
+      <li>Overall grade (A-F) and score (0-100)</li>
+      <li>Strictness profile (Basic / Standard / Strict / Paranoid)</li>
+      <li>Counts per severity (Critical / High / Medium / Low)</li>
+      <li>Per-category grade and pass rate (Security / SEO / Performance / GDPR / Accessibility)</li>
+      <li>Publish date</li>
+    </ul>
+    <p><strong>What is NEVER published:</strong></p>
+    <ul>
+      <li>Specific vulnerabilities or check IDs</li>
+      <li>Exposed files, paths, or credentials</li>
+      <li>Technology fingerprints (CMS, versions, server headers)</li>
+      <li>Your IP, User-Agent, or browser data</li>
+    </ul>
+    <p><strong>Right to withdraw:</strong> a publication can be withdrawn any time from the same device it was published from. Withdrawal is a soft-delete — the row stays for audit purposes but is no longer shown publicly. To withdraw from a different device (e.g. lost access) contact <a href="mailto:kontakt@gradovi.rs">kontakt@gradovi.rs</a>.</p>
+    <p><strong>Retention:</strong> public publications have no automatic expiry — they stay until the owner withdraws them. Withdrawn rows (<code>withdrawn_at IS NOT NULL</code>) are permanently deleted from the database after 90 days.</p>
+    <p><strong>Legal basis:</strong> explicit consent (Art. 12(1)(1) ZZPL) — a modal with a clear "what IS / what is NEVER" published list appears before every publication. The consent action is logged in <code>audit_log</code> as a <code>gallery_publish</code> event.</p>
+  </div>
+
+  </main>
+</div>
+<script src="./blog-common.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,370 @@
+# Lemon Squeezy — Kompletan Setup Playbook
+
+**Za Web Security Scanner (main) + Malware Scanner.** Operativno uputstvo —
+tačno šta kreirati na Lemon Squeezy i šta preneti u HF Space env.
+
+> Otvori Lemon dashboard: https://app.lemonsqueezy.com/
+> Sve cene su u USD (Lemon je globalni, ne EUR/RSD).
+
+---
+
+## 1. STORE — napravi jedan
+
+Dashboard → **Stores → New Store**
+
+| Polje | Vrednost |
+|---|---|
+| Store name | `Web Security Scanner` |
+| Store URL slug | `web-security-scanner` (URL postaje `web-security-scanner.lemonsqueezy.com`) |
+| Currency | `USD` |
+| Country | Srbija |
+| Tax mode | *Lemon Squeezy as Merchant of Record* (default — oni plaćaju PDV) |
+
+**Pokupi:** `Store ID` (broj, vidljiv u URL-u dashboard-a posle kreiranja).
+
+---
+
+## 2. PROIZVODI — kreiraj 3 komada
+
+Dashboard → **Products → New Product**. Svaki proizvod ima jednu ili više
+**varijanti** (varijanta = konkretna cena / billing plan).
+
+---
+
+### Proizvod A — **Pro Monthly**
+
+| Polje | Vrednost |
+|---|---|
+| Product name | `Pro Monthly` |
+| Description | `Monthly subscription — 240+ security checks, unlimited scans, PDF reports, priority support.` |
+| Type | **Subscription** |
+| Status | Published |
+
+**Varijanta (jedna):**
+
+| Polje | Vrednost |
+|---|---|
+| Variant name | `Monthly` |
+| Price | `9.00` USD |
+| Billing interval | `Every 1 month` |
+| Trial | — (bez trial-a, ili 7 dana ako hoćeš akviziciju) |
+
+**Pokupi posle publish-a:**
+- `Product ID`
+- `Variant ID` (za monthly)
+- `Share / Buy link` → **Overview → Share** dugme → URL oblika `https://web-security-scanner.lemonsqueezy.com/buy/<uuid>`
+
+---
+
+### Proizvod B — **Pro Yearly**
+
+| Polje | Vrednost |
+|---|---|
+| Product name | `Pro Yearly` |
+| Description | `Annual subscription — save 27% vs monthly. All Pro Monthly features + yearly billing.` |
+| Type | **Subscription** |
+| Status | Published |
+
+**Varijanta (jedna):**
+
+| Polje | Vrednost |
+|---|---|
+| Variant name | `Yearly` |
+| Price | `79.00` USD |
+| Billing interval | `Every 1 year` |
+
+**Pokupi:**
+- `Product ID` (Yearly)
+- `Variant ID` (za yearly)
+- `Buy link`
+
+> Napomena: Pro Monthly i Pro Yearly mogu biti **jedan proizvod sa 2 varijante**
+> umesto 2 odvojena proizvoda. Ako ih spojiš, upisuješ **isti** broj i u
+> `LEMON_PRODUCT_ID_MONTHLY` i u `LEMON_PRODUCT_ID_YEARLY`, ali i dalje dva
+> različita `LEMON_VARIANT_*`. Kôd radi oba načina — mapiranje plana ide
+> isključivo preko `LEMON_VARIANT_*` (`subscription.py:_variant_to_plan_name`).
+
+---
+
+### Proizvod C — **Malware Scanner 5-Pack** *(NOVO — Faza 7)*
+
+| Polje | Vrednost |
+|---|---|
+| Product name | `Malware Scanner 5-Pack` |
+| Description | `5 full malware scans with Damage Report. 30-day validity. One-time payment — no subscription.` |
+| Type | **Single payment** (NIJE subscription) |
+| Status | Published |
+
+**Varijanta (jedna):**
+
+| Polje | Vrednost |
+|---|---|
+| Variant name | `5-Pack` |
+| Price | `3.00` USD |
+| Billing interval | — (single payment) |
+
+**Pokupi:**
+- `Product ID` (malware)
+- `Variant ID` (5-pack)
+- `Buy link`
+
+> **PAŽNJA — neslaganje sa kodom, odluči pre publish-a.** Description iznad kaže
+> *"30-day validity"*, ali `subscription.py` (`_MALWARE_PACK_CONFIG`) upisuje
+> `expires_at = NOW() + 36500 dana`, tj. krediti praktično nikad ne ističu.
+> Ili ispravi tekst opisa, ili promeni `days` u kodu — ne ostavljaj kako jeste
+> (obećanje kupcu ≠ ponašanje sistema).
+
+---
+
+## 3. WEBHOOK — jedan, zajednički za sve
+
+Dashboard → **Settings → Webhooks → + New Webhook**
+
+| Polje | Vrednost |
+|---|---|
+| Callback URL | `https://unlimitededition-web-security-scanner.hf.space/webhooks/lemon` |
+| Signing secret | (Lemon generiše — **kopiraj odmah**, ne pokazuje se ponovo) |
+| Events (čekiraj sve dole) | → vidi listu |
+
+**Čekiraj ove eventove:**
+
+Subscription (Pro Monthly/Yearly) — svih 11 je u `_HANDLED_EVENTS`
+(`subscription.py`), sve što nije čekirano tiho se ne obrađuje:
+- [x] `subscription_created`
+- [x] `subscription_updated`
+- [x] `subscription_cancelled`
+- [x] `subscription_resumed`
+- [x] `subscription_expired`
+- [x] `subscription_paused`
+- [x] `subscription_unpaused`
+- [x] `subscription_payment_success`
+- [x] `subscription_payment_failed`
+- [x] `subscription_payment_recovered`
+- [x] `subscription_payment_refunded`
+
+License keys — **obavezno**, ne opciono. `subscriptions.license_key` se puni
+isključivo iz ovih eventova (`subscription.py:_handle_license_key_event`), a
+login na `account.html` ide preko license key-a. Bez njih korisnik plati i
+nema čime da se uloguje:
+- [x] `license_key_created`
+- [x] `license_key_updated`
+
+One-time order (Malware 5-Pack — Faza 7):
+- [x] `order_created`
+
+**Pokupi:** `Signing secret` (HEX string, ~64 karaktera) — ide kao
+`LEMON_WEBHOOK_SECRET` u HF Secrets.
+
+---
+
+## 4. API KEY
+
+Dashboard → **Settings → API → + Create API key**
+
+| Polje | Vrednost |
+|---|---|
+| Name | `hf-space-backend` |
+| Scope | Default (full access) |
+
+**Pokupi:** API key string (`lsk_...`) — ide kao `LEMON_API_KEY` u HF Secrets.
+
+> Ovaj kôd ga ne koristi aktivno u ovom trenutku (sve radi kroz webhooks —
+> `LEMON_API_KEY` se u `subscription.py` čita samo za dijagnostiku), ali mora
+> biti postavljen da `/health` ne vraća `"lemon_api_key_set": false`.
+
+---
+
+## 5. ŠTA SVE POKUPITI — finalna checklist
+
+Kada završiš sve iznad, imaćeš u rukama ove vrednosti:
+
+| # | Vrednost | Odakle | Primer |
+|---|---|---|---|
+| 1 | **Store ID** | Dashboard URL posle kreiranja store-a | `12345` |
+| 2 | **Pro Monthly — Product ID** | Product → Overview | `567890` |
+| 3 | **Pro Monthly — Variant ID** | Product → Variants | `678901` |
+| 4 | **Pro Monthly — Buy URL** | Product → Share | `https://web-security-scanner.lemonsqueezy.com/buy/abc-uuid` |
+| 5 | **Pro Yearly — Product ID** | Product → Overview | `567891` |
+| 6 | **Pro Yearly — Variant ID** | Product → Variants | `678902` |
+| 7 | **Pro Yearly — Buy URL** | Product → Share | `https://.../buy/def-uuid` |
+| 8 | **Malware 5-Pack — Product ID** | Product → Overview | `567892` |
+| 9 | **Malware 5-Pack — Variant ID** | Product → Variants | `678903` |
+| 10 | **Malware 5-Pack — Buy URL** | Product → Share | `https://.../buy/ghi-uuid` |
+| 11 | **API Key** | Settings → API | `lsk_...` |
+| 12 | **Webhook Signing Secret** | Settings → Webhooks → click on webhook | HEX string |
+
+> Stavke 2 i 5 mogu biti isti broj ako si Monthly+Yearly spojio u jedan
+> proizvod. Tada taj isti broj upisuješ i u `LEMON_PRODUCT_ID_MONTHLY` i u
+> `LEMON_PRODUCT_ID_YEARLY` — env var `LEMON_PRODUCT_ID` (bez sufiksa)
+> **ne postoji** u kodu.
+
+---
+
+## 6. GDE ŠTA IDE U HF SPACE
+
+HF Space dashboard → **Settings → Variables and secrets**
+
+### 🔒 SECRETS (šifrovano — NE vidi se u UI posle snimanja)
+
+```
+LEMON_API_KEY                     = lsk_...
+LEMON_WEBHOOK_SECRET              = <HEX string>
+```
+
+### 📋 VARIABLES (plain text — sme da se vidi)
+
+```
+LEMON_STORE_ID                    = <store-id>
+LEMON_PRODUCT_ID_MONTHLY          = <product-id-monthly>
+LEMON_PRODUCT_ID_YEARLY           = <product-id-yearly>
+LEMON_PRODUCT_ID_MALWARE          = <product-id-malware>
+LEMON_VARIANT_MONTHLY             = <variant-id-monthly>
+LEMON_VARIANT_YEARLY              = <variant-id-yearly>
+LEMON_VARIANT_MALWARE_5_PACK      = <variant-id-5-pack>
+LEMON_BUY_URL_MONTHLY             = https://web-security-scanner.lemonsqueezy.com/buy/<uuid>
+LEMON_BUY_URL_YEARLY              = https://web-security-scanner.lemonsqueezy.com/buy/<uuid>
+LEMON_BUY_URL_MALWARE_5_PACK      = https://web-security-scanner.lemonsqueezy.com/buy/<uuid>
+```
+
+> **Imena moraju biti tačno ova** — ovo je kompletan spisak `LEMON_*` env
+> varijabli koje kôd uopšte čita (`subscription.py:51-59`, `api.py:3360-3362`
+> i `api.py:3525-3527`). Bilo koje drugo ime se tiho ignoriše.
+
+Šta stvarno utiče na naplatu, a šta je samo dijagnostika:
+
+| Var | Uloga |
+|---|---|
+| `LEMON_WEBHOOK_SECRET` | HMAC verifikacija webhooka. Ako fali → **svi** webhooks se odbijaju (401). |
+| `LEMON_VARIANT_MONTHLY` / `LEMON_VARIANT_YEARLY` | Jedino mapiranje varijante → `plan_name` (`pro_monthly` / `pro_yearly`). Ako fali → `subscription_created` puca. |
+| `LEMON_VARIANT_MALWARE_5_PACK` | Gate za `order_created`. Ako fali → kupovina 5-Pack-a se tiho ignoriše. |
+| `LEMON_BUY_URL_*` | Checkout linkovi za `/api/checkout/create`; `/api/status` javlja `pro_available=true` tek kad su MONTHLY i YEARLY oba postavljena. |
+| `LEMON_API_KEY`, `LEMON_STORE_ID`, `LEMON_PRODUCT_ID_*` | Trenutno **samo dijagnostika** u `/health` → `lemon`. Postavi ih svejedno, da health ne prijavljuje `<unset>`. |
+
+> Posle snimanja → **Factory reboot Space** (Settings → Factory rebuild).
+> Inače env se ne učita.
+
+---
+
+## 7. TESTIRANJE
+
+### Pre-flight (bez pravog kupovanja):
+
+```bash
+curl https://unlimitededition-web-security-scanner.hf.space/health
+```
+
+Očekivano (relevantan deo — `subscription.health_check()` pod ključem `lemon`):
+```json
+{
+  "status": "ok",
+  "db": { "...": "..." },
+  "lemon": {
+    "lemon_api_key_set": true,
+    "lemon_webhook_secret_set": true,
+    "lemon_store_id": "<tvoj-store-id>",
+    "lemon_product_id_monthly": "<tvoj-product-id-monthly>",
+    "lemon_product_id_yearly": "<tvoj-product-id-yearly>",
+    "lemon_product_id_malware": "<tvoj-product-id-malware>",
+    "lemon_variant_monthly": "<tvoj-variant-id-monthly>",
+    "lemon_variant_yearly": "<tvoj-variant-id-yearly>",
+    "lemon_variant_malware_5_pack": "<tvoj-variant-id-5-pack>",
+    "db_configured": true
+  }
+}
+```
+
+Ako bilo koje polje kaže `<unset>` ili `false` → env nije učitan. Proveri
+Secrets/Variables i factory reboot-uj.
+
+Buy linkove proveri odvojeno:
+```bash
+curl https://unlimitededition-web-security-scanner.hf.space/api/status
+```
+`pro_available: true` znači da su `LEMON_BUY_URL_MONTHLY` i
+`LEMON_BUY_URL_YEARLY` postavljeni; `malware_pack_available: true` isto za
+`LEMON_BUY_URL_MALWARE_5_PACK`.
+
+### Test kupovine (Lemon test mode):
+
+Dashboard → **Settings → Advanced → Test mode: ON**
+
+Kliknu pravi Buy URL → na checkout stranici unese test karticu:
+
+```
+Card: 4242 4242 4242 4242
+CVC:  bilo koje 3 cifre
+Date: bilo koja buduća
+ZIP:  bilo koja 5 cifara
+```
+
+Kupovina prolazi, webhook se okida, u `lemon_webhook_events` tabeli (Supabase)
+pojavljuje se nov red. Posle testa → **Test mode: OFF** pre produkcije.
+
+---
+
+## 8. REDOSLED KORAKA (operativno)
+
+1. [ ] Kreiraj Store → pokupi Store ID
+2. [ ] Kreiraj Proizvod A (Pro Monthly) → pokupi 3 stvari
+3. [ ] Kreiraj Proizvod B (Pro Yearly) → pokupi 3 stvari
+4. [ ] Kreiraj Proizvod C (Malware 5-Pack) → pokupi 3 stvari
+5. [ ] Kreiraj API Key → pokupi `lsk_...`
+6. [ ] Kreiraj Webhook → pokupi Signing Secret
+7. [ ] Unesi sve u HF Space (Secrets + Variables iz sekcije 6)
+8. [ ] Factory reboot HF Space
+9. [ ] `curl /health` (ključ `lemon`) + `curl /api/status` → verifikuj
+10. [ ] Test mode ON → test kupovina sa test karticom
+11. [ ] Proveri da li se pojavio red u `lemon_webhook_events` Supabase tabeli
+12. [ ] Test mode OFF → produkcija
+
+---
+
+## 9. ŠTA KÔD RADI AUTOMATSKI (samo informativno)
+
+- **Subscription kupovina** → `subscription_created` webhook → `subscription.py._handle_subscription_event` → INSERT u `subscriptions` tabelu → user od sada ima Pro.
+- **Subscription otkazana** → `subscription_cancelled` webhook → flip `status='cancelled'`, user gubi Pro na kraju plaćenog perioda.
+- **Malware 5-Pack kupovina** *(Faza 7)* → `order_created` webhook → DVA reda:
+  1. `subscriptions` tabela: `plan_name='malware_pack'`, `status='active'`, `license_key` (stiže naknadno, iz `license_key_created` eventa, match po `lemon_order_id`) — korisnik se loguje istim sistemom kao Pro
+  2. `malware_credits` tabela: `credits_total=5`, `credits_remaining=5`, `subscription_id` → FK na subscriptions red, `expires_at = NOW() + 36500 dana` (`_MALWARE_PACK_CONFIG` u `subscription.py` — praktično bez isteka)
+  → Korisnik dobija license_key, loguje se na account.html, vidi koliko mu je skenova ostalo
+  → Kad potroši sve: `credits_remaining=0`, red ostaje u bazi (NIKAD se ne briše). `subscriptions.status` se pri tome **ne** menja — nema koda koji ga flipuje na `expired`, to bi bilo ručno/kroz Lemon event
+  → Ako kupi ponovo: isti red u `subscriptions` (match po `email` + `plan_name='malware_pack'`), isti license_key, nov red u `malware_credits`, status opet `active`
+- **Malware scan sa kreditom** → api.py → proveri license_key → `db.find_active_malware_credits()`: `subscription_id` match + `credits_remaining > 0` (najnoviji red; `expires_at` se **ne** proverava jer krediti praktično ne ističu) → `consume_malware_credit()` atomic decrement sa CAS guard-om → dozvoli scan
+- **Malware scan bez kredita** → standardni free limit (1/24h po IP + fingerprint)
+
+---
+
+## 10. RIZICI / ČESTE GREŠKE
+
+| Greška | Simptom | Popravka |
+|---|---|---|
+| Zaboraviš Factory reboot | `/health` → `lemon` vraća `"<unset>"` | Settings → Factory rebuild |
+| Staviš Secret u Variables | Key vidljiv svima u UI | Briši i stavi u Secrets |
+| Pogrešan Webhook URL | Webhooks Dashboard → Logs pokazuje 404 | Mora biti `/webhooks/lemon` (ne `/webhook` singular) |
+| Test mode ostane ON | Prave kupovine ne dolaze | Settings → Advanced → Test mode OFF |
+| Postaviš `LEMON_PRODUCT_ID` (bez sufiksa) | Ime ne postoji u kodu → tiho se ignoriše | Koristi `LEMON_PRODUCT_ID_MONTHLY` / `_YEARLY` / `_MALWARE` |
+| Product ID upisan u `LEMON_VARIANT_*` | `subscription_created` puca: *"variant_id ... is not mapped to a known plan"*, webhook vraća 500 i Lemon retry-uje 3x pa odustane → kupac plaća, nema Pro | Plan mapiranje ide **isključivo** preko varijanti. Uzmi Variant ID (Product → Variants), ne Product ID |
+| Variant ID 5-Pack-a pogrešan | `order_created` se tiho ignoriše, nema kredita ni reda u bazi | Proveri `LEMON_VARIANT_MALWARE_5_PACK` |
+| `license_key_*` eventovi nisu čekirani | Kupac plati, red u `subscriptions` postoji ali `license_key` je NULL → ne može da se uloguje | Uključi `license_key_created` + `license_key_updated` na webhooku |
+| Webhook secret drift | Svi webhooks vraćaju 401 | Ako regenerišeš secret na Lemon-u, moraš ažurirati HF Secret + reboot |
+
+---
+
+## 11. KRATAK REZIME (TL;DR)
+
+**Kreiraš na Lemon:**
+- 1 Store
+- 3 Proizvoda (Pro Monthly, Pro Yearly, Malware 5-Pack)
+- 1 Webhook (na `/webhooks/lemon`)
+- 1 API Key
+
+**Šalješ mi / unosiš u HF Space:** 12 vrednosti iz tabele u sekciji 5.
+
+Kada to imaš, reci mi i nastavljam Fazu 7. Redosled implementacije:
+
+1. Migracija 022 — proširi `subscriptions.plan_name` CHECK za `'malware_pack'` + dodaj `malware_credits.subscription_id` FK
+2. `db.py` — nove funkcije: `find_active_malware_credits()`, `consume_malware_credit()`, `get_credits_for_subscription()`
+3. `subscription.py` — handler za `order_created` webhook: kreira subscription + malware_credits red
+4. `api.py` — `/malware-scan`: pre rate limita proveri kredite kroz license_key
+5. `account.html` — prikaži malware pakete (aktivne + istekle) sa brojem preostalih skenova
+6. `pricing.html` — kartica za $3/5 skenova (aktivna) + $30/60 i $300/700 (komentarisane u kodu, INACTIVE za prikaz)

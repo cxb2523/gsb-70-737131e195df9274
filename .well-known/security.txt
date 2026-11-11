@@ -1,0 +1,6 @@
+Contact: mailto:security@gradovi.rs
+Contact: https://github.com/UnlimitedEdition/security-scanner/security/advisories/new
+Expires: 2027-12-31T23:59:00.000Z
+Preferred-Languages: sr, en
+Canonical: https://security-skener.gradovi.rs/.well-known/security.txt
+Policy: https://security-skener.gradovi.rs/SECURITY.md
