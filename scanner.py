@@ -39,6 +39,7 @@ from checks import wellknown_check
 from checks.crawler import crawl
 from security_utils import safe_get, assert_safe_target, UnsafeTargetError
 import risk_engine
+from scan_audit import audit_scan_results
 
 # Hard upper bound on total scan wall-clock time. A malicious target could
 # otherwise keep the single scan slot busy indefinitely by responding slowly
@@ -564,6 +565,7 @@ def scan(
             "errors": errors,
             "total_checks": 0,
             "failed_checks": 0,
+            "audit": None,
         }
     except requests.exceptions.SSLError as e:
         errors.append(f"SSL greška: {str(e)[:100]}")
@@ -581,6 +583,7 @@ def scan(
             "errors": errors,
             "total_checks": 0,
             "failed_checks": 0,
+            "audit": None,
         }
     except Exception as e:
         errors.append(f"Greška pri učitavanju: {str(e)[:200]}")
@@ -818,6 +821,12 @@ def scan(
 
     score_data = compute_score(all_results, strictness=strictness)
 
+    # Offline audit of the results list: re-derives the score from the
+    # active strictness profile and reports exclusions, per-severity
+    # deduction buckets, bonus math and data-quality inconsistencies.
+    # Read-only — all_results is never mutated by the audit.
+    audit = audit_scan_results(all_results, strictness=strictness)
+
     # Risk priorities
     top_priorities = risk_engine.get_top_priorities(all_results, count=5)
 
@@ -839,6 +848,11 @@ def scan(
         "scan_time": scan_duration,
         "results": all_results,
         "score": score_data,
+        # Offline scoring audit (scan_audit.audit_scan_results). New key
+        # with a safe default — existing readers of this dict are
+        # unaffected. None only on the blocked/unreachable early returns
+        # above, where no checks ever ran.
+        "audit": audit,
         "errors": errors,
         "total_checks": len(all_results),
         "failed_checks": len([r for r in all_results if not r.get("passed")]),
